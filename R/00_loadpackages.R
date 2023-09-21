@@ -18,7 +18,7 @@ if(!require(wqtrends)){
     tbeptech = 'https://tbep-tech.r-universe.dev',
     CRAN = 'https://cloud.r-project.org'))
   install.packages('wqtrends')} ; library(wqtrends) # models and plots for trends
-# if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv) 
+if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
 # if(!require(changepoint)) { install.packages("changepoint")}; library(changepoint)
 # if(!require(strucchange)) { install.packages('strucchange')}; library(strucchange)
 # library(psych)
