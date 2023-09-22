@@ -11,6 +11,9 @@ sjr_dat <- sjr %>%
   select(station, date, measured_value) %>% 
   rename(value = measured_value) %>% 
   filter(station %in% c('JXTR17', 'JXTR21', 'MR312', 'MRT')) %>%
+  group_by(station, date) %>%  
+  summarize(value = mean(value, na.rm = T)) %>%
+  ungroup() %>% 
   mutate(yr = lubridate::year(date)) %>% 
   filter(yr > 2002 & yr < 2023) %>% 
   select(-yr)
