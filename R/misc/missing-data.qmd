@@ -1,0 +1,63 @@
+---
+title: "Missing Data Gaps"
+format: html
+execute:
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+load(here('output', 'data', 'comb.RData'))
+
+mdat <- comb_dat %>% 
+  group_by(station, date) %>%  
+  summarize(value = mean(value, na.rm = T)) %>% 
+  mutate(yr = year(date),
+         mo = month(date, label = T)) %>%
+  filter(yr > 2002 & yr < 2023)
+```
+
+
+# Identify Missing Data Gaps
+
+## GTMPINUT
+
+```{r}
+mdat %>% 
+  filter(station == "gtmpinut") %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+```
+
+Jan 2005
+Jun 2009
+Feb 2010
+Aug 2015
+Aug 2020
+
+## JXTR17
+
+There are a few month-years in which samples were collected more than once in the month.
+
+```{r}
+mdat %>% 
+  filter(station == "JXTR17") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+
+mdat %>% 
+  filter(station == "JXTR17") %>% 
+  dplyr::group_by(yr, mo) %>%
+  dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+  dplyr::filter(n > 1L) 
+```
