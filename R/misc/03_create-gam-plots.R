@@ -145,3 +145,6 @@ b <- show_prddoy(fm.mod, ylab = ylab) + labs(title = "GTMFMNUT")
 c <- show_prddoy(mrt.mod, ylab = ylab) + labs(title = "MRT")
 
 print((a + labs(x = "")) / (b + theme(legend.position = "none") + labs(x = "")) / (c + theme(legend.position = "none"))) %>% ggsave(filename = here('output', 'figures', 'doy-matanzas.png'), height = 11, width = 8.5, units = "in")
+
+
+rm(list = ls())
