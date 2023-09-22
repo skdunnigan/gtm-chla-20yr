@@ -81,7 +81,10 @@ pc2022 <- NUT %>%
 pcISCO <- bind_rows(pc2013, pc2018, pc2022)
 
 swmp_dat <- bind_rows(chla_dat, pcISCO) %>% 
-  rename(station = station_code)
+  rename(station = station_code) %>% 
+  group_by(station, date) %>%  
+  summarize(value = mean(value, na.rm = T)) %>%
+  ungroup()
 
 save(swmp_dat, file = here("output", "data", "swmp.RData"))
 
