@@ -1,0 +1,427 @@
+---
+title: "Patterns and Variability in Chla"
+format: html
+execute:
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+```{r}
+#| include: false
+library(here)
+source(here('R', '00_loadpackages.R'))
+
+```
+
+Using methods from @cloern2010, variability and patterns in monthly chlorophyll a data were extracted by decomposing the timeseries at each station using Equation 4 into an annual effect, mean seasonal pattern, and residual "events".
+
+::: callout-note
+Equation 4 from @cloern2010 :
+
+$$
+c_{ij}=Cy_im_j\epsilon_{ij}
+$$ Where $c_{ij}$ is chlorophyll concentration in year $i$($i=1,...,N$) and month $j$($j=1,...12$); C is the long-term mean of the series; $y_i$ is the annual effect in the ith year; $m_j$ is the seasonal (monthly) effect in the jth month; and $\epsilon_{ij}$ is the residual.
+
+-   If $y_i$ \>1, indicates a year with above-average mean Chl-a.
+-   If $m_j$ \>1, indicates a mean monthly Chl-a greater than the annual mean.
+-   If $\epsilon_{ij}$ \>1, indicates an observation greater than the expected value for that month and year.
+:::
+
+The data used in this effort has had missing raw monthly averages filled with averages derived from the generalized additive model predicted values.
+
+```{r}
+#| label: decomp-fxn
+#| include: false
+
+# function comes from Cloern and Jassby 2010 Supplemental Material
+
+decomp.mult <- function(x, startyr = NULL , endyr = NULL, event = T){
+#R2 .8.0 3/2/09 4:48 PM
+  if(class(x)[1]!='mts') dim(x)=c(length(x),1)
+  
+  if(is.null(startyr)) startyr <- start(x)[1]
+  
+  if(is.null(endyr)) endyr <- end(x)[1]
+  
+  d <- window(x, start = c(startyr,1), end = c(endyr,12), extend = T)
+  
+  results <- vector('list',dim(d)[2])
+  
+  names(results)= colnames(d)
+  
+  for(site in colnames (d)){
+    d1=d[,site]
+    
+    #long-term mean
+    grandmean = mean(d1, na.rm = T)
+    
+    # annual component
+    annualmean = aggregate(d1,1, mean, na.rm = T)
+    annualmeanreps = as.vector(t(matrix(rep(annualmean,12), 
+                                        ncol = 12)))
+    interann = ts(annualmeanreps,s=c(startyr,1),f = 12) / grandmean
+    # remaining components
+    if(event) {
+      # monthly component
+      d2 = matrix(d1, nrow = 12)
+      monthdev = sweep(d2,2, annualmean ,'/')
+      monthmean = apply(monthdev,1, mean , na.rm = T)
+      season = ts(rep(monthmean, endyr - startyr + 1), 
+                  s=c(startyr, 1), f = 12)
+      # events component
+      resids = sweep(monthdev, 1, monthmean , '/')
+      events = ts(as.vector(resids),
+                  s=c(startyr, 1),f = 12)
+    }
+    else {
+      # monthly component
+      season = d1/(grandmean * interann)
+    }
+    # prepare output
+    if(event) dcomp = ts.union(d1, grandmean, interann, season,
+      events) else dcomp =ts.union (d1, grandmean, interann,
+      season)
+    colnames(dcomp)[1]= 'original'
+    results[[site]]= dcomp
+    }
+    if(class(x)[1]!='mts') results[[1]] else results
+}
+
+```
+
+## Pine Island
+
+Load data for "gtmpinut"
+
+```{r}
+load(here('output', 'data', 'pi.RData'))
+```
+
+Convert data into a timeseries object and apply the decomp.mult() fxn
+
+```{r}
+ts <- ts(as.data.frame(mdat.pi %>%
+                            ungroup() %>% 
+                            select(date, value) %>%
+                            arrange(date) %>%
+                            select(value)
+                          ),
+             start = c(2003, 1),
+             end = c(2022, 12),
+             frequency = 12
+            )
+
+
+decomp <- data.frame(decomp.mult(ts)
+                        )%>% 
+              rename(value = original) %>% 
+                          bind_cols((mdat.pi %>% 
+                              select(date, value) %>% 
+                              arrange(date)
+                          )) %>% 
+                          select(-7) %>% 
+                          rename(value = 1)
+```
+
+Using the decomposition function from @cloern2010, summary information
+
+```{r}
+#|  label: d
+summary(decomp)
+```
+
+```{r}
+#| label: pi-variability-figures
+
+a <- ggplot(decomp) +
+            geom_line(aes(x = date, y = value), color = "blue") +
+            scale_x_date(date_breaks = "year", date_labels = "%Y") +
+            theme_bw() +
+            theme(axis.text.x = element_text(colour = c(NA, NA, "black", NA, NA)),
+                  panel.grid.minor = element_blank(),
+                  axis.text = element_text(color = "black")) +
+            labs(x = '',
+                 y = 'Chl-a \u00b5g/L',
+                 title = "A. Pine Island")
+    b <- decomp %>% 
+          mutate(year = year(date)) %>% 
+          select(year, interann) %>% 
+          unique() %>% 
+          ggplot() +
+            geom_col(aes(x = year, y = interann-1), fill = "red") +
+            geom_hline(yintercept = 0, color = "red") +
+            scale_x_continuous(breaks = seq(2000, 2022, by = 1)) +
+            scale_y_continuous(limits = c(-1,1)) +
+            theme_bw() +
+            theme(axis.text.x = element_text(colour = c(NA, NA, NA, "black", NA)),
+                  panel.grid = element_blank(),
+                  axis.text = element_text(color = "black")) +
+            labs(x = '',
+                 y = 'Annual')
+    c <- ggplot(decomp) +
+          geom_col(aes(x = date, y = events-1), fill = "purple") +
+          geom_hline(yintercept = 0, color = "purple") +
+          scale_x_date(date_breaks = "year", date_labels = "%Y") +
+          scale_y_continuous(limits = c(-1,2)) +
+          theme_bw() +
+          theme(axis.text.x = element_text(colour = c(NA, NA,"black", NA, NA)),
+                panel.grid = element_blank(),
+                axis.text = element_text(color = "black")) +
+          labs(x = '',
+               y = 'Residual')
+    d <- decomp %>% 
+          mutate(month = month(date, label = T)) %>% 
+          select(month, season) %>% 
+          unique %>% 
+          ggplot() +
+            geom_col(aes(x = month, y = season-1), fill = "green") +
+            geom_hline(yintercept = 0, color = "green") +
+            scale_y_continuous(limits = c(-1,1)) +
+            theme_bw() +
+            theme(axis.text = element_text(color = "black"),
+                  panel.grid = element_blank()) +
+            labs(x = '',
+                 y = 'Season')
+multi <- a/b/c/d
+multi
+# ggsave(multi, file = here('output', 'figures', 'GTMPINUT_variability.png'))
+
+rm(a, b, c, d, multi)
+```
+
+Calculate standard deviations for Pine Island variability values 
+
+```{r}
+sd_pi <- decomp %>% summarize_all(., ~sd(.x, na.rm = T)) %>% select(-1, -2, -date) %>% mutate(station = "gtmpinut")
+```
+
+```{r}
+
+# create mts timeseries for `wql` functions
+ts2 <- mdat.pi %>% 
+  mutate(
+    mo = lubridate::month(date, label = T)
+  ) %>% 
+  select(yr, mo, value) %>% 
+  pivot_wider(values_from = 'value', names_from = 'mo') %>% 
+  arrange(yr) %>% 
+  select(-yr) %>% 
+  ts(start = 2003, end = 2022, frequency = 1)
+
+eof <- eof(ts2, 1)
+
+eof$variance
+eof$amplitude
+eof$REOF
+eof$eigen.pct
+
+```
+
+```{r}
+mo <- c(1:12)
+month.abb[mo]
+mo <- as_tibble(factor(month.abb[mo],levels=month.abb)) %>% rename(mo = value)
+eof_c <- as_tibble(eof$REOF) %>% bind_cols(mo)
+
+eof_c_f <- 
+ggplot(data = eof_c_pi, aes(x = mo, y = abs(EOF1))) +
+  geom_segment(aes(xend = mo, y = 0, yend = abs(EOF1))) +
+  geom_point(size=5, color="#0072B2") +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1), breaks = c(.2,.4,.6,.8,1.0)) +
+  theme_bw() +
+  theme(axis.text = element_text(color = "black", size = 12)) +
+  labs(x = "",
+       y = "EOF1 Coefficients")
+
+# ggsave(eof_c_f, file = here('output', 'figures', 'eof_c_pi.png'))
+
+
+```
+
+```{r}
+
+phenoPhase(ts)
+
+ggplot(data = phenoPhase(ts), 
+       aes(x = year, y = fulcrum)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "",
+       y = "Fulcrums of Cumulative Chl")
+
+```
+
+```{r}
+summary(breakpoints(ts2 ~ 1))
+
+```
+
+## San Sebastian
+
+Load data for "gtmpinut"
+
+```{r}
+load(here('output', 'data', 'ss.RData'))
+```
+
+Convert data into a timeseries object and apply the decomp.mult() fxn
+
+```{r}
+ts <- ts(as.data.frame(mdat.ss %>%
+                            ungroup() %>% 
+                            select(date, value) %>%
+                            arrange(date) %>%
+                            select(value)
+                          ),
+             start = c(2003, 1),
+             end = c(2022, 12),
+             frequency = 12
+            )
+
+
+decomp <- data.frame(decomp.mult(ts)
+                        )%>% 
+              rename(value = original) %>% 
+                          bind_cols((mdat.ss %>% 
+                              select(date, value) %>% 
+                              arrange(date)
+                          )) %>% 
+                          select(-7) %>% 
+                          rename(value = 1)
+```
+
+Using the decomposition function from @cloern2010, summary information
+
+```{r}
+#|  label: d
+summary(decomp)
+```
+
+```{r}
+#| label: ss-variability-figures
+
+a <- ggplot(decomp) +
+            geom_line(aes(x = date, y = value), color = "blue") +
+            scale_x_date(date_breaks = "year", date_labels = "%Y") +
+            theme_bw() +
+            theme(axis.text.x = element_text(colour = c(NA, NA, "black", NA, NA)),
+                  panel.grid.minor = element_blank(),
+                  axis.text = element_text(color = "black")) +
+            labs(x = '',
+                 y = 'Chl-a \u00b5g/L',
+                 title = "B. San Sebastian")
+    b <- decomp %>% 
+          mutate(year = year(date)) %>% 
+          select(year, interann) %>% 
+          unique() %>% 
+          ggplot() +
+            geom_col(aes(x = year, y = interann-1), fill = "red") +
+            geom_hline(yintercept = 0, color = "red") +
+            scale_x_continuous(breaks = seq(2000, 2022, by = 1)) +
+            scale_y_continuous(limits = c(-1,1)) +
+            theme_bw() +
+            theme(axis.text.x = element_text(colour = c(NA, NA, NA, "black", NA)),
+                  panel.grid = element_blank(),
+                  axis.text = element_text(color = "black")) +
+            labs(x = '',
+                 y = 'Annual')
+    c <- ggplot(decomp) +
+          geom_col(aes(x = date, y = events-1), fill = "purple") +
+          geom_hline(yintercept = 0, color = "purple") +
+          scale_x_date(date_breaks = "year", date_labels = "%Y") +
+          scale_y_continuous(limits = c(-1,2)) +
+          theme_bw() +
+          theme(axis.text.x = element_text(colour = c(NA, NA,"black", NA, NA)),
+                panel.grid = element_blank(),
+                axis.text = element_text(color = "black")) +
+          labs(x = '',
+               y = 'Residual')
+    d <- decomp %>% 
+          mutate(month = month(date, label = T)) %>% 
+          select(month, season) %>% 
+          unique %>% 
+          ggplot() +
+            geom_col(aes(x = month, y = season-1), fill = "green") +
+            geom_hline(yintercept = 0, color = "green") +
+            scale_y_continuous(limits = c(-1,1)) +
+            theme_bw() +
+            theme(axis.text = element_text(color = "black"),
+                  panel.grid = element_blank()) +
+            labs(x = '',
+                 y = 'Season')
+multi <- a/b/c/d
+multi
+# ggsave(multi, file = here('output', 'figures', 'GTMSSNUT_variability.png'))
+
+rm(a, b, c, d, multi)
+```
+
+Calculate standard deviations for Pine Island variability values 
+
+```{r}
+sd_ss <- decomp %>% summarize_all(., ~sd(.x, na.rm = T)) %>% select(-1, -2, -date) %>% mutate(station = "gtmssnut")
+```
+
+```{r}
+
+# create mts timeseries for `wql` functions
+ts2 <- mdat.ss %>% 
+  mutate(
+    mo = lubridate::month(date, label = T)
+  ) %>% 
+  select(yr, mo, value) %>% 
+  pivot_wider(values_from = 'value', names_from = 'mo') %>% 
+  arrange(yr) %>% 
+  select(-yr) %>% 
+  ts(start = 2003, end = 2022, frequency = 1)
+
+eof <- eof(ts2, 1)
+
+eof$variance
+eof$amplitude
+eof$REOF
+eof$eigen.pct
+
+```
+
+```{r}
+mo <- c(1:12)
+month.abb[mo]
+mo <- as_tibble(factor(month.abb[mo],levels=month.abb)) %>% rename(mo = value)
+eof_c <- as_tibble(eof$REOF) %>% bind_cols(mo)
+
+eof_c_f <- 
+ggplot(data = eof_c, aes(x = mo, y = abs(EOF1))) +
+  geom_segment(aes(xend = mo, y = 0, yend = abs(EOF1))) +
+  geom_point(size=5, color="#0072B2") +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1), breaks = c(.2,.4,.6,.8,1.0)) +
+  theme_bw() +
+  theme(axis.text = element_text(color = "black", size = 12)) +
+  labs(x = "",
+       y = "EOF1 Coefficients")
+
+# ggsave(eof_c_f, file = here('output', 'figures', 'eof_c_ss.png'))
+
+
+```
+
+```{r}
+
+phenoPhase(ts)
+
+ggplot(data = phenoPhase(ts), 
+       aes(x = year, y = fulcrum)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "",
+       y = "Fulcrums of Cumulative Chl")
+
+```
+
+```{r}
+summary(breakpoints(ts2 ~ 1, h = 0.1))
+
+```
