@@ -9,6 +9,8 @@ editor_options:
 ---
 
 ```{r}
+library(here) 
+source(here('R', '00_loadpackages.R'))
 load(here('output', 'data', 'comb.RData'))
 
 mdat <- comb_dat %>% 
@@ -17,6 +19,16 @@ mdat <- comb_dat %>%
   mutate(yr = year(date),
          mo = month(date, label = T)) %>%
   filter(yr > 2002 & yr < 2023)
+
+
+# load models for missing calculations
+load(file = here("output", "models", "fm.mod.RData")) 
+load(file = here("output", "models", "j17.mod.RData")) 
+load(file = here("output", "models", "j21.mod.RData")) 
+load(file = here("output", "models", "mrt.mod.RData")) 
+load(file = here("output", "models", "pc.mod.RData")) 
+load(file = here("output", "models", "pi.mod.RData"))
+load(file = here("output", "models", "ss.mod.RData")) 
 ```
 
 
@@ -30,11 +42,55 @@ mdat %>%
   pivot_wider(names_from = mo, values_from = value, id_cols = yr)
 ```
 
-Jan 2005
-Jun 2009
-Feb 2010
-Aug 2015
-Aug 2020
+There are NA's for the following month-years:
+
+-   Jan 2005
+-   Jun 2009
+-   Feb 2010
+-   Aug 2015
+-   Aug 2020
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+  "Jan", 2005,
+  "Jun", 2009,
+  "Feb", 2010,
+  "Aug", 2015,
+  "Aug", 2020
+)
+
+pi.pred <- anlz_prdday(pi.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "gtmpinut",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.pi <- bind_rows(mdat, pi.pred) %>% filter(station == "gtmpinut") %>% ungroup()# bind predicted values into main data that has been subsetted for just the PI site
+
+rm(mis, pi.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.pi %>% pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+```
+
+Export and save pi data 
+
+```{r}
+save(mdat.pi, file = here('output', 'data', 'pi.RData'))
+
+```
 
 ## JXTR17
 
@@ -60,4 +116,185 @@ mdat %>%
   dplyr::group_by(yr, mo) %>%
   dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
   dplyr::filter(n > 1L) 
+```
+
+## GTMSSNUT
+
+```{r}
+mdat %>% 
+  filter(station == "gtmssnut") %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+```
+
+There are NA's for the following month-years:
+
+-   Jan 2005
+-   Jun 2009
+-   Feb 2010
+-   Sep 2019
+-   Aug 2020
+-   Jul 2022
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+  "Jan", 2005,
+  "Jun", 2009,
+  "Feb", 2010,
+  "Sep", 2019,
+  "Aug", 2020,
+  "Jul", 2022
+)
+
+ss.pred <- anlz_prdday(ss.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "gtmssnut",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.ss <- bind_rows(mdat, ss.pred) %>% filter(station == "gtmssnut") %>% ungroup()# bind predicted values into main data that has been subsetted for just the PI site
+
+rm(mis, ss.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.ss %>% pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+```
+
+Export and save data 
+
+```{r}
+save(mdat.ss, file = here('output', 'data', 'ss.RData'))
+
+```
+
+## Fort Matanzas
+
+```{r}
+mdat %>% 
+  filter(station == "gtmfmnut") %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+```
+
+There are NA's for the following month-years:
+
+-   Jan 2005
+-   Jun 2009
+-   Feb 2010
+-   Nov 2015
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+  "Jan", 2005,
+  "Jun", 2009,
+  "Feb", 2010,
+  "Nov", 2015
+)
+
+fm.pred <- anlz_prdday(fm.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "gtmfmnut",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.fm <- bind_rows(mdat, fm.pred) %>% filter(station == "gtmfmnut") %>% ungroup()# bind predicted values into main data that has been subsetted for just the FM site
+
+rm(mis, fm.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.fm %>% pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+```
+
+Export and save pi data 
+
+```{r}
+save(mdat.fm, file = here('output', 'data', 'fm.RData'))
+
+```
+
+## Pellicer Creek
+
+```{r}
+mdat %>% 
+  filter(station == "gtmpcnut") %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+```
+
+There are NA's for the following month-years:
+
+-   Jan 2003
+-   Jan 2005
+-   Sep 2009
+-   Feb 2010
+-   Aug 2015
+-   Sep 2015
+-   Jul 2020
+-   Jul 2022
+
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+  "Jan", 2003,
+  "Jan", 2005,
+  "Sep", 2009,
+  "Feb", 2010,
+  "Aug", 2015,
+  "Sep", 2015,
+  "Jul", 2020,
+  "Jul", 2022
+)
+
+pc.pred <- anlz_prdday(pc.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "gtmpcnut",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.pc <- bind_rows(mdat, pc.pred) %>% filter(station == "gtmpcnut") %>% ungroup()# bind predicted values into main data that has been subsetted for just the PI site
+
+rm(mis, pc.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.pc %>% pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+```
+
+Export and save pi data 
+
+```{r}
+save(mdat.pc, file = here('output', 'data', 'pc.RData'))
+
 ```
