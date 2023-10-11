@@ -20,9 +20,9 @@ if(!require(wqtrends)){
   install.packages('wqtrends')} ; library(wqtrends) # models and plots for trends
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
 # if(!require(changepoint)) { install.packages("changepoint")}; library(changepoint)
-# if(!require(strucchange)) { install.packages('strucchange')}; library(strucchange)
+if(!require(strucchange)) { install.packages('strucchange')}; library(strucchange)
 # library(psych)
-# library(wql)
+library(wql)
 
 # 04 markdown ----
 library(rmarkdown)
