@@ -121,6 +121,7 @@ Missing values for
 -   Sep 2005
 -   Dec 2005
 -   Oct 2007
+-   Aug 2008
 -   Oct 2012
 -   Jun 2014
 -   Jul 2016
@@ -143,6 +144,7 @@ mis <- tribble(
 'Sep', 2005,
 'Dec', 2005,
 'Oct', 2007,
+'Aug', 2008,
 'Oct', 2012,
 'Jun', 2014,
 'Jul', 2016,
@@ -705,4 +707,10 @@ Export and save pi data
 ```{r}
 save(mdat.pc, file = here('output', 'data', 'pc.RData'))
 
+```
+
+## clear environment
+
+```{r}
+rm(list=ls())
 ```
