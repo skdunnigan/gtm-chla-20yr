@@ -283,7 +283,164 @@ save(mdat.ss, file = here('output', 'data', 'ss.RData'))
 
 ```
 
-## Fort Matanzas
+## JXTR21
+
+There are a few month-years in which samples were collected more than once in the month.
+
+```{r}
+mdat %>% 
+  filter(station == "JXTR21") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+
+mdat %>% 
+  filter(station == "JXTR21") %>% 
+  dplyr::group_by(yr, mo) %>%
+  dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+  dplyr::filter(n > 1L) 
+```
+
+Missing values for 
+
+-   Jan 2003
+-   Sep 2004
+-   Nov 2004
+-   Oct 2005
+-   Oct 2006
+-   Feb 2007
+-   Oct 2007
+-   Dec 2007
+-   Mar 2011
+-   Oct 2011
+-   Jan 2012
+-   Oct 2012
+-   Feb 2014
+-   Jun 2014
+-   Jul 2016
+-   Nov 2016
+-   Aug 2017
+-   Sep 2017
+-   Dec 2018
+-   Mar 2020
+-   Jun 2020
+-   Jul 2020
+-   Aug 2020
+-   Sep 2020
+-   Oct 2020
+-   Nov 2020
+-   Jan 2021
+-   May 2021
+-   Jan 2022
+-   Feb 2022
+-   Jun 2022
+-   Oct 2022
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+'Jan', 2003,
+'Sep', 2004,
+'Nov', 2004,
+'Oct', 2005,
+'Oct', 2006,
+'Feb', 2007,
+'Oct', 2007,
+'Dec', 2007,
+'Mar', 2011,
+'Oct', 2011,
+'Jan', 2012,
+'Oct', 2012,
+'Feb', 2014,
+'Jun', 2014,
+'Jul', 2016,
+'Nov', 2016,
+'Aug', 2017,
+'Sep', 2017,
+'Dec', 2018,
+'Mar', 2020,
+'Jun', 2020,
+'Jul', 2020,
+'Aug', 2020,
+'Sep', 2020,
+'Oct', 2020,
+'Nov', 2020,
+'Jan', 2021,
+'May', 2021,
+'Jan', 2022,
+'Feb', 2022,
+'Jun', 2022,
+'Oct', 2022
+)
+
+j21.pred <- anlz_prdday(j21.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "JXTR21",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.j21 <- bind_rows(mdat, j21.pred) %>% filter(station == "JXTR21") %>% ungroup()# bind predicted values into main data that has been subsetted for just the JXTR21 site
+
+rm(mis, j21.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.j21 %>% 
+  filter(station == "JXTR21") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+
+```
+
+Export and save JXTR21 data 
+
+```{r}
+mdat.j21 <- 
+mdat.j21 %>% 
+  filter(station == "JXTR21") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, date, value, yr, mo) 
+
+save(mdat.j21, file = here('output', 'data', 'j21.RData'))
+
+```
+
+## GTMFMNUT
 
 ```{r}
 mdat %>% 
@@ -339,7 +496,142 @@ save(mdat.fm, file = here('output', 'data', 'fm.RData'))
 
 ```
 
-## Pellicer Creek
+## MRT
+
+There are a few month-years in which samples were collected more than once in the month.
+
+```{r}
+mdat %>% 
+  filter(station == "MRT") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr)
+
+mdat %>% 
+  filter(station == "MRT") %>% 
+  dplyr::group_by(yr, mo) %>%
+  dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+  dplyr::filter(n > 1L) 
+```
+
+Missing values for 
+
+Jan 2003
+Jul 2004
+Sep 2004
+Oct 2005
+Oct 2006
+Jan 2007
+Oct 2007
+Jan 2008
+
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+'Jan', 2003,
+'Sep', 2004,
+'Nov', 2004,
+'Oct', 2005,
+'Oct', 2006,
+'Feb', 2007,
+'Oct', 2007,
+'Dec', 2007,
+'Mar', 2011,
+'Oct', 2011,
+'Jan', 2012,
+'Oct', 2012,
+'Feb', 2014,
+'Jun', 2014,
+'Jul', 2016,
+'Nov', 2016,
+'Aug', 2017,
+'Sep', 2017,
+'Dec', 2018,
+'Mar', 2020,
+'Jun', 2020,
+'Jul', 2020,
+'Aug', 2020,
+'Sep', 2020,
+'Oct', 2020,
+'Nov', 2020,
+'Jan', 2021,
+'May', 2021,
+'Jan', 2022,
+'Feb', 2022,
+'Jun', 2022,
+'Oct', 2022
+)
+
+j21.pred <- anlz_prdday(j21.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "JXTR21",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.j21 <- bind_rows(mdat, j21.pred) %>% filter(station == "JXTR21") %>% ungroup()# bind predicted values into main data that has been subsetted for just the JXTR21 site
+
+rm(mis, j21.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.j21 %>% 
+  filter(station == "JXTR21") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+
+```
+
+Export and save JXTR21 data 
+
+```{r}
+mdat.j21 <- 
+mdat.j21 %>% 
+  filter(station == "JXTR21") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, date, value, yr, mo) 
+
+save(mdat.j21, file = here('output', 'data', 'j21.RData'))
+
+```
+
+
+## GTMPCNUT
 
 ```{r}
 mdat %>% 
