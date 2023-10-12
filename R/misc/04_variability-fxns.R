@@ -55,7 +55,9 @@ decomp.mult <- function(x, startyr = NULL , endyr = NULL, event = T){
   if(class(x)[1]!='mts') results[[1]] else results
 }
 
-var_fig <- function(dat, site){
+var_fig <- function(dat, site, save){
+  
+  filename <- paste0(site,"-variability.png")
   
   ts <- ts(as.data.frame(dat %>%
                            ungroup() %>% 
@@ -130,7 +132,12 @@ var_fig <- function(dat, site){
          y = 'Season')
   multi <- a/b/c/d
   
-  print(multi)
+  if (save == TRUE) {
+    ggsave(multi, filename = here('output', 'figures', 'variability', filename))
+  }
+  else {
+    print(multi)
+  }
   
 }
 
