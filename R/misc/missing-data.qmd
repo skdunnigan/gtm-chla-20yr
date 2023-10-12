@@ -118,6 +118,111 @@ mdat %>%
   dplyr::filter(n > 1L) 
 ```
 
+Missing values for 
+
+-   Sep 2004
+-   Sep 2005
+-   Dec 2005
+-   Oct 2007
+-   Oct 2012
+-   Jun 2014
+-   Jul 2016
+-   Nov 2016
+-   Aug 2017
+-   Sep 2017
+-   Mar 2020
+-   Jun - Nov 2020
+-   Feb 2021
+-   Apr 2021
+-   May 2021
+-   Nov 2021
+
+```{r}
+# create tribble for the missing values
+
+mis <- tribble(
+  ~mo, ~yr,
+'Sep', 2004,
+'Sep', 2005,
+'Dec', 2005,
+'Oct', 2007,
+'Oct', 2012,
+'Jun', 2014,
+'Jul', 2016,
+'Nov', 2016,
+'Aug', 2017,
+'Sep', 2017,
+'Mar', 2020,
+'Jun', 2020,
+'Jul', 2020,
+'Aug', 2020,
+'Sep', 2020,
+'Oct', 2020,
+'Nov', 2020,
+'Feb', 2021,
+'Apr', 2021,
+'May', 2021,
+'Nov', 2021
+)
+
+j17.pred <- anlz_prdday(j17.mod) %>% # get predicted values from GAM output
+              mutate(yr = lubridate::year(date), 
+                     mo = lubridate::month(date, label = T)) %>% 
+              group_by(yr, mo) %>% 
+              summarize(value = mean(value, na.rm = T)) %>% 
+              ungroup() %>% 
+              inner_join(mis) %>% 
+              mutate(station = "JXTR17",
+                     day = 01,
+                     date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
+              select(-day)
+
+mdat.j17 <- bind_rows(mdat, j17.pred) %>% filter(station == "JXTR17") %>% ungroup()# bind predicted values into main data that has been subsetted for just the JXTR17 site
+
+rm(mis, j17.pred)
+```
+
+Check new dataset to make sure there are no NA values
+
+```{r}
+mdat.j17 %>% 
+  filter(station == "JXTR17") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, value, yr, mo) %>% 
+  pivot_wider(names_from = mo, values_from = value, id_cols = yr) # check to make sure no NA's
+
+
+```
+
+Export and save JXTR17 data 
+
+```{r}
+mdat.j17 <- 
+mdat.j17 %>% 
+  filter(station == "JXTR17") %>%
+  mutate(mo = month(date), 
+    yr.mo = paste0(yr,"-",mo)) %>% 
+  group_by(station, yr.mo) %>% 
+  summarize(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  mutate(day = 01, 
+         date = as.Date(paste0(yr.mo,"-", day)),
+         mo = month(date, label =T),
+         yr = year(date)) %>% 
+  select(station, date, value, yr, mo) 
+
+save(mdat.j17, file = here('output', 'data', 'j17.RData'))
+
+```
+
 ## GTMSSNUT
 
 ```{r}
