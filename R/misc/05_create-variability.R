@@ -19,26 +19,19 @@ load(here('output', 'data', 'pc.RData'))
 
 # variability figures -----------------------------------------------------
 ## create variability figure (from Cloern and Jassby 2010)
-var_fig(dat = mdat.pi, site = "GTMPINUT") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'GTMPINUT-variability.png'))
+var_fig(dat = mdat.pi, site = "GTMPINUT", save = T) 
 
-var_fig(dat = mdat.j17, site = "JXTR17") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'JXTR17-variability.png'))
+var_fig(dat = mdat.j17, site = "JXTR17", save = T) 
 
-var_fig(dat = mdat.ss, site = "GTMSSNUT") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'GTMSSNUT-variability.png'))
+var_fig(dat = mdat.ss, site = "GTMSSNUT", save = T)
 
-var_fig(dat = mdat.j21, site = "JXTR21") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'JXTR21-variability.png'))
+var_fig(dat = mdat.j21, site = "JXTR21", save = T) 
 
-var_fig(dat = mdat.fm, site = "GTMFMNUT") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'GTMFMNUT-variability.png'))
+var_fig(dat = mdat.fm, site = "GTMFMNUT", save = T) 
 
-var_fig(dat = mdat.mrt, site = "MRT") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'MRT-variability.png'))
+var_fig(dat = mdat.mrt, site = "MRT", save = T) 
 
-var_fig(dat = mdat.pc, site = "GTMPCNUT") %>% 
-  ggsave(file = here('output', 'figures', 'variability', 'GTMPCNUT-variability.png'))
+var_fig(dat = mdat.pc, site = "GTMPCNUT", save = T) 
 
 
 # variability sd tables ---------------------------------------------------
