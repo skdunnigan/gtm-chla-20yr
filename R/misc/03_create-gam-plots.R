@@ -55,7 +55,7 @@ plot1 <- function(mod, site, threshold, save) {
   c <- a / b
   
   if (save == TRUE) {
-  ggsave(c, filename = here('output', 'figures', filename))
+  ggsave(c, filename = here('output', 'figures', 'trends', filename))
   }
   else {
     print(c)
@@ -63,13 +63,13 @@ plot1 <- function(mod, site, threshold, save) {
   
 }
 
-plot1(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = F)
-plot1(mod = j17.mod, site = "JXTR17", threshold = 6.6, save = F)
-plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = F)
+plot1(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = T)
+plot1(mod = j17.mod, site = "JXTR17", threshold = 6.6, save = T)
+plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = T)
 plot1(mod = j21.mod, site = "JXTR21", threshold = 4.0, save = T)
-plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = F)
-plot1(mod = mrt.mod, site = "MRT", threshold = 5.5, save = F)
-plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = F)
+plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = T)
+plot1(mod = mrt.mod, site = "MRT", threshold = 5.5, save = T)
+plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = T)
 
 
 # create trend plots for 3 timeframes -------------------------------------
@@ -90,7 +90,7 @@ plot2 <- function(mod, site, threshold, save) {
   d <- a / b / c
   
   if (save == TRUE) {
-    ggsave(d, filename = here('output', 'figures', filename))
+    ggsave(d, filename = here('output', 'figures', 'trends', filename))
   }
   else {
     print(d)
@@ -118,7 +118,7 @@ plot3 <- function(mod, site, save){
   a <- show_prddoy(mod, ylab = ylab)
   
   if (save == TRUE) {
-    ggsave(a, filename = here('output', 'figures', filename))
+    ggsave(a, filename = here('output', 'figures', 'trends', filename))
   }
   else {
     print(a)
@@ -133,6 +133,9 @@ plot3(mod = j21.mod, site = "JXTR21", save = T)
 plot3(mod = fm.mod, site = "GTMFMNUT", save = T)
 plot3(mod = mrt.mod, site = "MRT", save = T)
 plot3(mod = pc.mod, site = "GTMPCNUT", save = T)
+
+
+ylab <- "Chlorophyll-a (\U00B5g/L)"
 
 a <- show_prddoy(pi.mod, ylab = ylab) + labs(title = "GTMPINUT")
 b <- show_prddoy(j17.mod, ylab = ylab) + labs(title = "JXTR17")
