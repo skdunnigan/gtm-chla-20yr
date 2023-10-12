@@ -1,5 +1,5 @@
 ---
-title: "Missing Data Gaps"
+title: "Identify Missing Data Gaps"
 format: html
 execute:
   warning: false
@@ -30,9 +30,6 @@ load(file = here("output", "models", "pc.mod.RData"))
 load(file = here("output", "models", "pi.mod.RData"))
 load(file = here("output", "models", "ss.mod.RData")) 
 ```
-
-
-# Identify Missing Data Gaps
 
 ## GTMPINUT
 
@@ -532,6 +529,25 @@ Oct 2006
 Jan 2007
 Oct 2007
 Jan 2008
+Jun 2011
+Oct 2011
+Oct 2012
+Sep 2013
+Jun 2014
+Jul 2016
+Nov 2016
+Aug 2017
+Sep 2017
+Mar 2020
+Jun 2020
+Jul 2020
+Aug 2020
+Sep 2020
+Oct 2020
+Nov 2020
+Jan 2021
+May 2021
+Jun 2022
 
 
 ```{r}
@@ -540,24 +556,22 @@ Jan 2008
 mis <- tribble(
   ~mo, ~yr,
 'Jan', 2003,
+'Jul', 2004,
 'Sep', 2004,
-'Nov', 2004,
 'Oct', 2005,
 'Oct', 2006,
-'Feb', 2007,
+'Jan', 2007,
 'Oct', 2007,
-'Dec', 2007,
-'Mar', 2011,
+'Jan', 2008,
+'Jun', 2011,
 'Oct', 2011,
-'Jan', 2012,
 'Oct', 2012,
-'Feb', 2014,
+'Sep', 2013,
 'Jun', 2014,
 'Jul', 2016,
 'Nov', 2016,
 'Aug', 2017,
 'Sep', 2017,
-'Dec', 2018,
 'Mar', 2020,
 'Jun', 2020,
 'Jul', 2020,
@@ -567,34 +581,31 @@ mis <- tribble(
 'Nov', 2020,
 'Jan', 2021,
 'May', 2021,
-'Jan', 2022,
-'Feb', 2022,
-'Jun', 2022,
-'Oct', 2022
+'Jun', 2022
 )
 
-j21.pred <- anlz_prdday(j21.mod) %>% # get predicted values from GAM output
+mrt.pred <- anlz_prdday(mrt.mod) %>% # get predicted values from GAM output
               mutate(yr = lubridate::year(date), 
                      mo = lubridate::month(date, label = T)) %>% 
               group_by(yr, mo) %>% 
               summarize(value = mean(value, na.rm = T)) %>% 
               ungroup() %>% 
               inner_join(mis) %>% 
-              mutate(station = "JXTR21",
+              mutate(station = "MRT",
                      day = 01,
                      date = lubridate::ymd(paste0(yr,"-",mo,"-",day))) %>% 
               select(-day)
 
-mdat.j21 <- bind_rows(mdat, j21.pred) %>% filter(station == "JXTR21") %>% ungroup()# bind predicted values into main data that has been subsetted for just the JXTR21 site
+mdat.mrt <- bind_rows(mdat, mrt.pred) %>% filter(station == "MRT") %>% ungroup()# bind predicted values into main data that has been subsetted for just the MRT site
 
-rm(mis, j21.pred)
+rm(mis, mrt.pred)
 ```
 
 Check new dataset to make sure there are no NA values
 
 ```{r}
-mdat.j21 %>% 
-  filter(station == "JXTR21") %>%
+mdat.mrt %>% 
+  filter(station == "MRT") %>%
   mutate(mo = month(date), 
     yr.mo = paste0(yr,"-",mo)) %>% 
   group_by(station, yr.mo) %>% 
@@ -609,12 +620,12 @@ mdat.j21 %>%
 
 ```
 
-Export and save JXTR21 data 
+Export and save MRT data 
 
 ```{r}
-mdat.j21 <- 
-mdat.j21 %>% 
-  filter(station == "JXTR21") %>%
+mdat.mrt <- 
+mdat.mrt %>% 
+  filter(station == "MRT") %>%
   mutate(mo = month(date), 
     yr.mo = paste0(yr,"-",mo)) %>% 
   group_by(station, yr.mo) %>% 
@@ -626,7 +637,7 @@ mdat.j21 %>%
          yr = year(date)) %>% 
   select(station, date, value, yr, mo) 
 
-save(mdat.j21, file = here('output', 'data', 'j21.RData'))
+save(mdat.mrt, file = here('output', 'data', 'mrt.RData'))
 
 ```
 
