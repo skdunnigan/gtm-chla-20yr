@@ -140,14 +140,14 @@ ylab <- "Chlorophyll-a (\U00B5g/L)"
 a <- show_prddoy(pi.mod, ylab = ylab) + labs(title = "GTMPINUT")
 b <- show_prddoy(j17.mod, ylab = ylab) + labs(title = "JXTR17")
 
-print((a + labs(x = "")) / (b + theme(legend.position = "none"))) %>% ggsave(filename = here('output', 'figures', 'doy-tolomato.png'))
+print((a + labs(x = "")) / (b + theme(legend.position = "none"))) %>% ggsave(filename = here('output', 'figures', 'trends', 'doy-tolomato.png'))
 
 
 a <- show_prddoy(j21.mod, ylab = ylab) + labs(title = "JXTR21")
 b <- show_prddoy(fm.mod, ylab = ylab) + labs(title = "GTMFMNUT")
 c <- show_prddoy(mrt.mod, ylab = ylab) + labs(title = "MRT")
 
-print((a + labs(x = "")) / (b + theme(legend.position = "none") + labs(x = "")) / (c + theme(legend.position = "none"))) %>% ggsave(filename = here('output', 'figures', 'doy-matanzas.png'), height = 11, width = 8.5, units = "in")
+print((a + labs(x = "")) / (b + theme(legend.position = "none") + labs(x = "")) / (c + theme(legend.position = "none"))) %>% ggsave(filename = here('output', 'figures', 'trends', 'doy-matanzas.png'), height = 11, width = 8.5, units = "in")
 
 
 rm(list = ls())
