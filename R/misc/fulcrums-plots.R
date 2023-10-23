@@ -13,7 +13,7 @@ load(here('output', 'data', 'mrt.RData'))
 load(here('output', 'data', 'pc.RData'))
 
 
-fulc <- function(dat, station, save){
+fulc <- function(dat, station, save, stat){
   
   filename <- paste0(station,"-fulcrum.png")
   
@@ -31,6 +31,20 @@ fulc <- function(dat, station, save){
   
   phenoPhase(ts)
   
+  if (stat == TRUE) {
+    fulc <-
+      ggplot(data = phenoPhase(ts), 
+             aes(x = year, y = fulcrum)) +
+      geom_hline(aes(yintercept = mean(fulcrum)), color = "darkorange") +
+      geom_smooth(method = "lm", se = F, color = "black", linetype = "dashed") +
+      ggpubr::stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`, `~"))) +
+      geom_point(size=5, color="#0072B2") +
+      theme_bw() +
+      theme(axis.text = element_text(size = 12, color = "black")) +
+      labs(x = "",
+           y = "Fulcrums of Cumulative Chl",
+           title = station)
+  } else{
   fulc <-
   ggplot(data = phenoPhase(ts), 
          aes(x = year, y = fulcrum)) +
@@ -42,6 +56,7 @@ fulc <- function(dat, station, save){
     labs(x = "",
          y = "Fulcrums of Cumulative Chl",
          title = station)
+  }
   
   if (save == TRUE) {
     ggsave(fulc, filename = here('output', 'figures', 'fulcrums', filename))
@@ -51,10 +66,10 @@ fulc <- function(dat, station, save){
   }
 }
 
-fulc(dat = mdat.pi, station = "GTMPINUT", save = F)
-fulc(dat = mdat.j17, station = "JXTR17", save = F)
-fulc(dat = mdat.ss, station = "GTMSSNUT", save = F)
-fulc(dat = mdat.j21, station = "JXTR21", save = F)
-fulc(dat = mdat.fm, station = "GTMFMNUT", save = F)
-fulc(dat = mdat.mrt, station = "MRT", save = F)
-fulc(dat = mdat.pc, station = "GTMPCNUT", save = F)
+fulc(dat = mdat.pi, station = "GTMPINUT", save = F, stat = F)
+fulc(dat = mdat.j17, station = "JXTR17", save = F, stat = F)
+fulc(dat = mdat.ss, station = "GTMSSNUT", save = F, stat = F)
+fulc(dat = mdat.j21, station = "JXTR21", save = F, stat = F)
+fulc(dat = mdat.fm, station = "GTMFMNUT", save = F, stat = F)
+fulc(dat = mdat.mrt, station = "MRT", save = F, stat = F)
+fulc(dat = mdat.pc, station = "GTMPCNUT", save = F, stat = F)
