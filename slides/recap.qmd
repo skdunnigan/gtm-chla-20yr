@@ -1,0 +1,158 @@
+---
+title: "Chl-a"
+author: "SDK"
+format: 
+  revealjs:
+    citations-hover: true
+    bibliography: references.bib
+---
+
+# Summary
+
+## Background
+
+This analysis was conducted using long-term, continuous monitoring data from two programs in the Guana Tolomato Matanzas (GTM) estuary: 
+
+-   GTM National Estuarine Research Reserve's System-Wide Monitoring Program (SWMP) (*n=4*)
+-   St. Johns River Water Management District (*n=3*)
+
+Using 20-year time period between January 2003 - December 2022 of monthly chlorophyll-*a* grab samples. 
+
+## Station Locations
+
+# Summary of data preparation
+
+## QAQC'd all chlorophyll station data
+
+`R/misc/gtmnerr-swmp-chla-prep.qmd` for all the GTMNERR data prep
+
+-   Kept only "grab" data (removed ISCO from complete dataset)
+-   Removed rejected, suspect, and below sensor limit flagged data
+-   Replaced values below the nominal base MDL of 0.55 ($\mu$g/L) with the nominal base
+
+## QAQC'd all chlorophyll station data
+
+`R/misc/gtmnerr-swmp-chla-prep.qmd` for all the GTMNERR data prep
+
+-   Averaged all duplicate grab samples into monthly average
+-   For Pellicer Creek, used ISCO data collected at similar timeframes to fill in missing gaps with grab data.
+
+## QAQC'd all chlorophyll station data
+
+`R/misc/gtmnerr-swmp-chla-prep.qmd` for all the GTMNERR data prep
+
+Removed suspect flags from SJRWMD data and prepped `R/misc/sjr_dat.R`
+
+Combined GTMNERR and SJRWMD data into one dataframe `R/misc/combine-files.R` and got it into format for modeling.
+
+## Data Distribution
+
+```{r}
+#| echo: false
+library(here)
+source(here('R', '00_loadpackages.R'))
+
+load(file = here("output", "data", "dat.RData")) # load prepped data file
+
+a <- dat %>% 
+        mutate(station = factor(station, 
+                                levels = c("GTMPINUT",
+                                           "JXTR17",
+                                           "GTMSSNUT",
+                                           "JXTR21",
+                                           "GTMFMNUT",
+                                           "MRT",
+                                           "GTMPCNUT"))) %>% 
+        ggplot(aes(x = value, y = station, fill = station)) +
+        ggdist::stat_slab(aes(thickness = after_stat(pdf*n)), alpha = 0.8, scale = 0.7) +
+        ggdist::stat_dotsinterval(side = "bottom", scale = 0.7, slab_linewidth = NA) +
+        scale_fill_okabeito() +
+        theme_classic() +
+        theme(legend.position = "none") +
+        labs(x = "Chlorophyll-a (\U00B5g/L)",
+             y = "",
+             title = "Identity")
+
+b <- dat %>% 
+  mutate(station = factor(station, 
+                          levels = c("GTMPINUT",
+                                     "JXTR17",
+                                     "GTMSSNUT",
+                                     "JXTR21",
+                                     "GTMFMNUT",
+                                     "MRT",
+                                     "GTMPCNUT"))) %>% 
+  ggplot(aes(x = log10(value), y = station, fill = station)) +
+  ggdist::stat_slab(aes(thickness = after_stat(pdf*n)), alpha = 0.8, scale = 0.7) +
+  ggdist::stat_dotsinterval(side = "bottom", scale = 0.7, slab_linewidth = NA) +
+  scale_fill_okabeito() +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Chlorophyll-a (\U00B5g/L)",
+       y = "",
+       title = "Log10")
+
+a + b
+```
+
+# Data Analysis
+
+-   trend analysis with generalized additive models
+-   decomposition of timeseries for variability calculations
+-   calculations of fulcrums for seasonality
+-   breakpoints for events of interest
+
+## Trend Analysis
+
+-   Using methods from @beck2022, the `wqtrends` package was used to fit a generalized additive model on the log10-transformed chl-*a* for each station. 
+
+-   Diagnostic information of the model fit and procedure were checked using the `mgcv` package.
+
+-   Models and diagnostics were created in `R/misc/02_models.R` and all models and diagnostic figures stored in `.../output/models`
+
+## Model Fit
+
+Combined summary information on model fit:
+
+```{r}
+read.csv(here('output', 'models', 'gam.fit.csv')) %>% 
+  kbl()
+```
+
+## Model Fit
+
+Combined summary information on model fit:
+
+```{r}
+read.csv(here('output', 'models', 'gam.summary.csv')) %>% 
+  kbl()
+```
+
+## GAM Plots and Trend Analysis
+
+-   A meta-analysis regression model was applied three distinctive time periods: first 10 years, second 10 years, and the last 5 years of the 20-year time series.
+
+-   Using the models, figures were created to plot predictions for GAMs over the chl-**a** timeseries for each station. 
+
+## Plots
+
+::: {.panel-tabset}
+
+### GTMPINUT
+
+
+### JXTR17
+
+### GTMSSNUT
+
+### JXTR21
+
+### GTMFMNUT
+
+### MRT
+
+### GTMPCNUT
+
+:::
+
+# References
