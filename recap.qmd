@@ -1,0 +1,472 @@
+---
+title: "Trends and variability in chlorophyll a in the GTM estuary"
+author: "SDK"
+format: 
+  revealjs:
+    citations-hover: true
+    bibliography: references.bib
+execute:
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+bibliography: references.bib
+---
+
+```{r}
+#| label: load
+#| include: false
+library(here)
+source(here('R', '00_loadpackages.R'))
+```
+
+# Summary
+
+## Background
+
+This analysis was conducted using long-term, continuous monitoring data from two programs in the Guana Tolomato Matanzas (GTM) estuary:
+
+-   GTM National Estuarine Research Reserve's System-Wide Monitoring Program (SWMP) (*n=4*)
+-   St. Johns River Water Management District (*n=3*)
+
+Using 20-year time period between January 2003 - December 2022 of monthly chlorophyll-*a* grab samples.
+
+## Station Locations
+
+```{r}
+#| label: map
+#| echo: false
+
+loc <- readxl::read_xlsx(here('data', 'station-locations.xlsx')) %>% janitor::clean_names() %>% mutate(station_name = toupper(station_name))
+
+loc %>%
+  leaflet(width = 900) %>%
+  addTiles() %>%
+  addMarkers(clusterOptions = markerClusterOptions(),
+             label = ~htmlEscape(station_name),
+             labelOptions = labelOptions(textsize = "15px")) 
+
+```
+
+# Summary of data preparation
+
+## QAQC'd all chlorophyll station data
+
+`R/misc/gtmnerr-swmp-chla-prep.qmd` for all the GTMNERR data prep
+
+-   Kept only "grab" data (removed ISCO from complete dataset)
+-   Removed rejected, suspect, and below sensor limit flagged data
+-   Replaced values below the nominal base MDL of 0.55 ($\mu$g/L) with the nominal base
+
+## QAQC'd all chlorophyll station data
+
+`R/misc/gtmnerr-swmp-chla-prep.qmd` for all the GTMNERR data prep
+
+-   Averaged all duplicate grab samples into monthly average
+-   For Pellicer Creek, used ISCO data collected at similar timeframes to fill in missing gaps with grab data.
+
+## QAQC'd all chlorophyll station data
+
+Removed suspect flags from SJRWMD data and prepped (`R/misc/sjr_dat.R`)
+
+Combined GTMNERR and SJRWMD data into one dataframe (`R/misc/combine-files.R`) and got it into format for modeling.
+
+## Data Distribution
+
+```{r}
+#| echo: false
+library(here)
+source(here('R', '00_loadpackages.R'))
+
+load(file = here("output", "data", "dat.RData")) # load prepped data file
+
+a <- dat %>% 
+        mutate(station = factor(station, 
+                                levels = c("GTMPINUT",
+                                           "JXTR17",
+                                           "GTMSSNUT",
+                                           "JXTR21",
+                                           "GTMFMNUT",
+                                           "MRT",
+                                           "GTMPCNUT"))) %>% 
+        ggplot(aes(x = value, y = station, fill = station)) +
+        ggdist::stat_slab(aes(thickness = after_stat(pdf*n)), alpha = 0.8, scale = 0.7) +
+        ggdist::stat_dotsinterval(side = "bottom", scale = 0.7, slab_linewidth = NA) +
+        scale_fill_okabeito() +
+        theme_classic() +
+        theme(legend.position = "none") +
+        labs(x = "Chlorophyll-a (\U00B5g/L)",
+             y = "",
+             title = "Identity")
+
+b <- dat %>% 
+  mutate(station = factor(station, 
+                          levels = c("GTMPINUT",
+                                     "JXTR17",
+                                     "GTMSSNUT",
+                                     "JXTR21",
+                                     "GTMFMNUT",
+                                     "MRT",
+                                     "GTMPCNUT"))) %>% 
+  ggplot(aes(x = log10(value), y = station, fill = station)) +
+  ggdist::stat_slab(aes(thickness = after_stat(pdf*n)), alpha = 0.8, scale = 0.7) +
+  ggdist::stat_dotsinterval(side = "bottom", scale = 0.7, slab_linewidth = NA) +
+  scale_fill_okabeito() +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "Chlorophyll-a (\U00B5g/L)",
+       y = "",
+       title = "Log10")
+
+a + b
+```
+
+# Data Analysis
+
+-   trend analysis using generalized additive models with mixed-effects meta analysis [@beck2022]
+-   decomposition of timeseries for patterns and scales of variability [@cloern2010]
+-   calculations of fulcrums for seasonality [@cloern2023]
+-   breakpoints for events of interest [@phlips2021]
+
+# Trend Analysis
+
+-   The `wqtrends` package was used to fit a generalized additive model on the log10-transformed chl-*a* for each station.
+
+-   Diagnostic information of the model fit and procedure were checked using the `mgcv` package.
+
+-   Models and diagnostics were created in `R/misc/02_models.R` and all models and diagnostic figures stored in `.../output/models`
+
+## Model Fit
+
+Combined summary information on model fit:
+
+```{r}
+read.csv(here('output', 'models', 'gam.fit.csv')) %>% 
+  select(-X) %>% 
+  mutate(AIC = round(AIC, digits = 1),
+         GCV = round(GCV, digits = 3),
+         R2 = round(R2, digits = 2)) %>% 
+  kbl() %>% 
+  kable_styling(fixed_thead = T, font_size = 24) %>% 
+  row_spec(0, bold = T) %>%
+  column_spec(1, border_right = T) %>% 
+  kable_classic(c('striped', 'hover'), html_font = "Open Sans", full_width = F)
+```
+
+## Model Fit
+
+Combined summary information on model fit:
+
+```{r}
+read.csv(here('output', 'models', 'gam.summary.csv')) %>%
+  select(-X) %>% 
+  mutate(edf = round(edf, digits = 2),
+         Ref.df = round(Ref.df, digits = 2),
+         F = round(F, digits = 2)) %>% 
+  kbl() %>% 
+  kable_styling(fixed_thead = T, font_size = 24) %>% 
+  row_spec(0, bold = T) %>%
+  column_spec(1, border_right = T) %>% 
+  kable_classic(c('striped', 'hover'), html_font = "Open Sans", full_width = T)
+```
+
+## GAM Plots and Trend Analysis
+
+-   A meta-analysis regression model was applied to test annual (Jan 1 - Dec 31) trends in four distinctive time periods for each site:
+    -   the entire 20-year record
+    -   first 10 years
+    -   second 10 years
+    -   the last 5 years
+-   Using the models, figures were created to plot predictions for GAMs over the chl-*a* time series for each station.
+
+## GTMPINUT
+
+![](output/figures/trends/GTMPINUT.plots.png)
+
+## GTMPINUT
+
+![](output/figures/trends/GTMPINUTtrend.plots.png)
+
+## JXTR17
+
+![](output/figures/trends/JXTR17.plots.png)
+
+## JXTR17
+
+![](output/figures/trends/JXTR17trend.plots.png)
+
+## GTMSSNUT
+
+![](output/figures/trends/GTMSSNUT.plots.png)
+
+## GTMSSNUT
+
+![](output/figures/trends/GTMSSNUTtrend.plots.png)
+
+## JXTR21
+
+![](output/figures/trends/JXTR21.plots.png)
+
+## JXTR21
+
+![](output/figures/trends/JXTR21trend.plots.png)
+
+## GTMFMNUT
+
+![](output/figures/trends/GTMFMNUT.plots.png)
+
+## GTMFMNUT
+
+![](output/figures/trends/GTMFMNUTtrend.plots.png)
+
+## MRT
+
+![](output/figures/trends/MRT.plots.png)
+
+## MRT
+
+![](output/figures/trends/MRTtrend.plots.png)
+
+## GTMPCNUT
+
+![](output/figures/trends/GTMPCNUT.plots.png)
+
+## GTMPCNUT
+
+![](output/figures/trends/GTMPCNUTtrend.plots.png)
+
+## Annual Trend Summaries
+
+Slopes for trend analysis for four timeframes (`*<0.05`, `**<0.01`, `***<0.001`)
+
+```{r}
+#| label: trend-summaries-tbl
+#| echo: false
+
+tribble(
+  ~`Trend Timeframe`, ~GTMPINUT, ~JXTR17, ~GTMSSNUT, ~JXTR21, ~GTMFMNUT, ~MRT, ~GTMPCNUT,
+  "20 years", '0.05', '-0.04', '0.09*', '-0.02', '0.088**', '0.04', '0.11',
+  "First 10 years", '0.24', '0.00', '0.26*', '0.03', '0.23**', '0.1', '1.14**', 
+  "Second 10 years", '0.29***', '0.11', '0.19*', '-0.06', '0.13*', '-0.12*', '0.15',
+  "Last 5 years", '0.73***', '-0.25', '0.17', '-0.25**', '0.06', '-0.31*', '0.42'
+) %>% 
+  kbl() %>% 
+  kable_styling(fixed_thead = T, font_size = 24) %>% 
+  row_spec(0, bold = T) %>%
+  column_spec(1, border_right = T) %>% 
+  kable_classic(c('striped', 'hover'), html_font = "Open Sans", full_width = T)
+
+```
+
+## Annual Trend Summaries
+
+Log10 slopes (+/- 95% confidence interval) for trend analysis for four timeframes (`*<0.05`, `**<0.01`, `***<0.001`)
+
+```{r}
+#| label: trend-summaries-log-tbl
+#| echo: false
+
+tribble(
+  ~`Trend Timeframe`, ~GTMPINUT, ~JXTR17, ~GTMSSNUT, ~JXTR21, ~GTMFMNUT, ~MRT, ~GTMPCNUT,
+  "20 years", '0 (0,0.01)', '0 (-0.01, 0)', '0.01 (0, 0.02)*', '0 (-0.01, 0)', '0.01 (0, 0.02)**', '0 (0, 0.01)', '0.01 (-0.01, 0.02)',
+  "First 10 years", '0.02 (0, 0.04)', '0 (-0.01, 0.01)', '0.03 (0,0.05)*', '0 (-0.01, 0)', '0.03 (0.01, 0.05)**', '0.01 (0, 0.02)', '0.06 (0.03, 0.1)**', 
+  "Second 10 years", '0.02 (0.01,0.04)***', '0.01 (0, 0.02)', '0.02 (0, 0.03)*', '-0.01 (-0.02, 0)', '0.02 (0, 0.03)*', '-0.01 (-0.02, 0)*', '0.01 (-0.01, 0.03)',
+  "Last 5 years", '0.06 (0.03, 0.08)***', '-0.02 (-0.05, 0.01)', '0.01 (-0.02, 0.05)', '-0.04 (-0.07, -0.01)**', '0.01 (-0.02, 0.03)', '-0.03 (-0.06, 0)*', '0.03 (-0.03, 0.08)'
+) %>% 
+  kbl() %>% 
+  kable_styling(fixed_thead = T, font_size = 20) %>% 
+  row_spec(0, bold = T) %>%
+  column_spec(1, border_right = T) %>% 
+  kable_classic(c('striped', 'hover'), html_font = "Open Sans", full_width = T)
+
+```
+
+# Patterns and scales of variability
+
+-   Variability and patterns in the monthly chl-*a* were extracted by decomposing the time series at each station into an annual effect, mean seasonal pattern, and residual "events".
+
+-   Missing monthly data values for all stations were filled using the averaged predicted day of the year values from the generalized additive models (`R/misc/missing-data.qmd`)
+
+## Equation from @cloern2010
+
+::: callout-note
+### Equation 4:
+
+$$
+c_{ij}=Cy_im_j\epsilon_{ij}
+$$ Where $c_{ij}$ is chlorophyll concentration in year $i$($i=1,...,N$) and month $j$($j=1,...12$); *C* is the long-term mean of the series; $y_i$ is the annual effect in the *i*th year; $m_j$ is the seasonal (monthly) effect in the *j*th month; and $\epsilon_{ij}$ is the residual.
+
+-   If $y_i$ \>1, indicates a year with above-average mean Chl-*a*.
+-   If $m_j$ \>1, indicates a mean monthly Chl-*a* greater than the annual mean.
+-   If $\epsilon_{ij}$ \>1, indicates an observation greater than the expected value for that month and year.
+:::
+
+## GTMPINUT
+
+![](output/figures/variability/GTMPINUT-variability.png)
+
+## JXTR17
+
+![](output/figures/variability/JXTR17-variability.png)
+
+## GTMSSNUT
+
+![](output/figures/variability/GTMSSNUT-variability.png)
+
+## JXTR21
+
+![](output/figures/variability/JXTR21-variability.png)
+
+## GTMFMNUT
+
+![](output/figures/variability/GTMFMNUT-variability.png)
+
+## MRT
+
+![](output/figures/variability/MRT-variability.png)
+
+## GTMPCNUT
+
+![](output/figures/variability/GTMPCNUT-variability.png)
+
+## Coefficients of variation
+
+```{r}
+#| label: coef-v
+
+tribble(
+  ~Station, ~Annual, ~Seasonal, ~Residual,
+  "GTMPINUT", 0.23, 0.34, 0.35,
+  "JXTR17", 0.15, 0.27, 0.34,
+  "GTMSSNUT", 0.23, 0.22, 0.34,
+  "JXTR21", 0.14, 0.37, 0.31,
+  "GTMFMNUT", 0.24, 0.33, 0.41,
+  "MRT", 0.18, 0.35, 0.45,
+  "GTMPCNUT", 0.35, 0.41, 0.51
+) %>% 
+  kbl(caption = "Standard deviations of chl-a variability extracted from timeseries of seven continuous long-term monitoring stations in the Guana Tolomato Matanzas estuary. The mean value of each of these (dimensionless) components is 1, so these standard deviations are equivalent to coefficients of variation.") %>% 
+  kable_styling(fixed_thead = T, font_size = 24) %>%
+  row_spec(0, bold = T) %>%
+  column_spec(1, border_right = T) %>%
+  kable_classic(c('striped', 'hover'), html_font = "Open Sans", full_width = F)
+
+```
+
+# Seasonality
+
+-   Measured changes in phases of annual chl-*a* cycles using `wql` package.
+
+-   Used `phenoPhase()` to calculate the fulcrum or "center of gravity" as the date each year in months when the cumulative chl-*a* reached half the total annual cumulative chl-*a*. This was used as an indicator of peak annual biomass.
+
+-   This is a common index of plankton phenology [@greve2005]
+
+## GTMPINUT
+
+![](output/figures/fulcrums/GTMPINUT-fulcrum.png)
+
+## JXTR17
+
+![](output/figures/fulcrums/JXTR17-fulcrum.png)
+
+## GTMSSNUT
+
+![](output/figures/fulcrums/GTMSSNUT-fulcrum.png)
+
+## JXTR21
+
+![](output/figures/fulcrums/JXTR21-fulcrum.png)
+
+## GTMFMNUT
+
+![](output/figures/fulcrums/GTMFMNUT-fulcrum.png)
+
+## MRT
+
+![](output/figures/fulcrums/MRT-fulcrum.png)
+
+## GTMPCNUT
+
+![](output/figures/fulcrums/GTMPCNUT-fulcrum.png)
+
+# Seasonal Trends
+
+-   A meta-analysis regression model was applied to test seasonal (spring:summer Jan 1 - Jun 30; summer:fall Jul 1 - Dec 31) trends in four distinctive time periods for each site:
+    -   the entire 20-year record
+    -   First 10 years
+    -   Second 10 years
+    -   Last 5 years
+
+## GTMPINUT
+
+![](output/figures/trends/GTMPINUT20snl-trend.plots.png)
+
+## GTMPINUT
+
+![](output/figures/trends/GTMPINUTsnl-trend.plots.png)
+
+## JXTR17
+
+![](output/figures/trends/JXTR1720snl-trend.plots.png)
+
+## JXTR17
+
+![](output/figures/trends/JXTR17snl-trend.plots.png)
+
+## GTMSSNUT
+
+![](output/figures/trends/GTMSSNUT20snl-trend.plots.png)
+
+## GTMSSNUT
+
+![](output/figures/trends/GTMSSNUTsnl-trend.plots.png)
+
+## JXTR21
+
+![](output/figures/trends/JXTR2120snl-trend.plots.png)
+
+## JXTR21
+
+![](output/figures/trends/JXTR21snl-trend.plots.png)
+
+## GTMFMNUT
+
+![](output/figures/trends/GTMFMNUT20snl-trend.plots.png)
+
+## GTMFMNUT
+
+![](output/figures/trends/GTMFMNUTsnl-trend.plots.png)
+
+## MRT
+
+![](output/figures/trends/MRT20snl-trend.plots.png)
+
+## MRT
+
+![](output/figures/trends/MRTsnl-trend.plots.png)
+
+## GTMPCNUT
+
+![](output/figures/trends/GTMPCNUT20snl-trend.plots.png)
+
+## GTMPCNUT
+
+![](output/figures/trends/GTMPCNUTsnl-trend.plots.png)
+
+# Breakpoints
+
+*Still in progress*
+
+# Multivariate ENSO Index (MEI)
+
+Used data from https://psl.noaa.gov/enso/mei/
+
+## MEI Plot
+
+![](output/figures/mei-plot.png)
+
+# Packages 
+
+-   `wql` [@jassby2022wq]
+-   `wqtrends` [@beck2022wq]
+
+# References

@@ -43,7 +43,7 @@ fulc <- function(dat, station, save, stat){
       theme(axis.text = element_text(size = 12, color = "black")) +
       labs(x = "",
            y = "Fulcrums of Cumulative Chl",
-           title = station)
+           caption = "Orange horizontal line indicates the mean fulcrum value. Dashed black line is a linear regression.")
   } else{
   fulc <-
   ggplot(data = phenoPhase(ts), 
@@ -55,7 +55,7 @@ fulc <- function(dat, station, save, stat){
     theme(axis.text = element_text(size = 12, color = "black")) +
     labs(x = "",
          y = "Fulcrums of Cumulative Chl",
-         title = station)
+         caption = "Orange horizontal line indicates the mean fulcrum value. Dashed black line is a linear regression.")
   }
   
   if (save == TRUE) {
@@ -66,10 +66,10 @@ fulc <- function(dat, station, save, stat){
   }
 }
 
-fulc(dat = mdat.pi, station = "GTMPINUT", save = F, stat = F)
-fulc(dat = mdat.j17, station = "JXTR17", save = F, stat = F)
-fulc(dat = mdat.ss, station = "GTMSSNUT", save = F, stat = F)
-fulc(dat = mdat.j21, station = "JXTR21", save = F, stat = F)
-fulc(dat = mdat.fm, station = "GTMFMNUT", save = F, stat = F)
-fulc(dat = mdat.mrt, station = "MRT", save = F, stat = F)
-fulc(dat = mdat.pc, station = "GTMPCNUT", save = F, stat = F)
+fulc(dat = mdat.pi, station = "GTMPINUT", save = T, stat = F)
+fulc(dat = mdat.j17, station = "JXTR17", save = T, stat = F)
+fulc(dat = mdat.ss, station = "GTMSSNUT", save = T, stat = F)
+fulc(dat = mdat.j21, station = "JXTR21", save = T, stat = F)
+fulc(dat = mdat.fm, station = "GTMFMNUT", save = T, stat = F)
+fulc(dat = mdat.mrt, station = "MRT", save = T, stat = F)
+fulc(dat = mdat.pc, station = "GTMPCNUT", save = T, stat = F)

@@ -33,9 +33,12 @@ ggplot(meiv2, aes(x = date, y = mei)) +
   geom_hline(yintercept = 0, color = "black") + 
   scale_x_date(date_minor_breaks = "year") +
   theme_bw() +
+  theme(axis.text = element_text(size = 12, color = "black")) +
   labs(y = "MEI.v2",
        x = "",
        title = "Multivariate ENSO Index (MEI) from 2003-2022.
        Positive values (red) indicate El Ni\U00F1o periods and negative values (blue) La Ni\U00F1 a periods.")
 
 print(mei.plot)
+
+# ggsave(mei.plot, filename = here('output', 'figures', 'mei-plot.png'))
