@@ -36,7 +36,7 @@ library(scales) # scale functions for visualization
 library(plotly) # create interactive web graphics - use for html output files
 
 # 06 mapping ---------------------------------------------------------------
-# library(leaflet)
-# library(htmltools)
-# library(sf)
+library(leaflet)
+library(htmltools)
+library(sf)
 
