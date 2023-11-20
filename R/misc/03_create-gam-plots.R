@@ -291,4 +291,38 @@ plot5(mod = fm.mod, site = "GTMFMNUT", save = T)
 plot5(mod = mrt.mod, site = "MRT", save = T)
 plot5(mod = pc.mod, site = "GTMPCNUT", save = T)
 
+# fulcrum timeframes
+
+plot6 <- function(mod, site, save) {
+  ylab <- "Chlorophyll-a (\U00B5g/L)"
+  
+  site <- paste(site)
+  filename <- paste0(site,"fulc_snl-trend.plots.png")
+  
+  a <- show_met2(mod, doystr = 121, doyend = 227, yrstr = 2003, yrend = 2022, ylab = ylab)
+  b <- show_met2(mod, doystr = 121, doyend = 227, yrstr = 2003, yrend = 2012, ylab = ylab) 
+  c <- show_met2(mod, doystr = 121, doyend = 227, yrstr = 2013, yrend = 2022, ylab = ylab) 
+  d <- show_met2(mod, doystr = 121, doyend = 227, yrstr = 2018, yrend = 2022, ylab = ylab) 
+  
+  
+  e <- a / b / c / d + 
+    plot_annotation(tag_levels = "a") & theme(plot.tag = element_text(size = 12))
+  
+  if (save == TRUE) {
+    ggsave(e, filename = here('output', 'figures', 'trends', filename))
+  }
+  else {
+    print(e)
+  }
+  
+}
+
+plot6(mod = pi.mod, site = "GTMPINUT", save = T)
+plot6(mod = j17.mod, site = "JXTR17", save = T)
+plot6(mod = ss.mod, site = "GTMSSNUT", save = T)
+plot6(mod = j21.mod, site = "JXTR21", save = T)
+plot6(mod = fm.mod, site = "GTMFMNUT", save = T)
+plot6(mod = mrt.mod, site = "MRT", save = T)
+plot6(mod = pc.mod, site = "GTMPCNUT", save = T)
+
 rm(list = ls())

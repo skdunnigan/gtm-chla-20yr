@@ -452,6 +452,42 @@ tribble(
 
 ![](output/figures/trends/GTMPCNUTsnl-trend.plots.png)
 
+# Seasonal Trends based on peak season
+
+-   A meta-analysis regression model was applied to test seasonal for trends in peak seasonal biomass (May - Aug) in four distinctive time periods for each site:
+    -   the entire 20-year record
+    -   First 10 years
+    -   Second 10 years
+    -   Last 5 years
+
+## GTMPINUT
+
+![](output/figures/trends/GTMPINUTfulc_snl-trend.plots.png)
+
+## JXTR17
+
+![](output/figures/trends/JXTR17fulc_snl-trend.plots.png)
+
+## GTMSSNUT
+
+![](output/figures/trends/GTMSSNUTfulc_snl-trend.plots.png)
+
+## JXTR21
+
+![](output/figures/trends/JXTR21fulc_snl-trend.plots.png)
+
+## GTMFMNUT
+
+![](output/figures/trends/GTMFMNUTfulc_snl-trend.plots.png)
+
+## MRT
+
+![](output/figures/trends/MRTfulc_snl-trend.plots.png)
+
+## GTMPCNUT
+
+![](output/figures/trends/GTMPCNUTfulc_snl-trend.plots.png)
+
 # Breakpoints
 
 *Still in progress*

@@ -73,3 +73,30 @@ fulc(dat = mdat.j21, station = "JXTR21", save = T, stat = F)
 fulc(dat = mdat.fm, station = "GTMFMNUT", save = T, stat = F)
 fulc(dat = mdat.mrt, station = "MRT", save = T, stat = F)
 fulc(dat = mdat.pc, station = "GTMPCNUT", save = T, stat = F)
+
+# fulcrum output 
+
+fulc_tbl <- function(dat){
+  
+  ts <- ts(as.data.frame(dat %>%
+                           ungroup() %>% 
+                           select(date, value) %>%
+                           arrange(date) %>%
+                           select(value)
+  ),
+  start = c(2003, 1),
+  end = c(2022, 12),
+  frequency = 12
+  )
+  
+  
+  print(phenoPhase(ts))
+}
+  
+fulc_tbl(dat = mdat.pi) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.j17) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.ss) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.j21) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.fm) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.mrt) %>% arrange(fulcrum)
+fulc_tbl(dat = mdat.pc) %>% arrange(fulcrum)
