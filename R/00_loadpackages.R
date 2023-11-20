@@ -34,6 +34,7 @@ library(khroma) # color-blind friendly palettes
 library(patchwork) # grid graphics
 library(scales) # scale functions for visualization
 library(plotly) # create interactive web graphics - use for html output files
+library(ggthemes) # theme expansion for ggplot2
 
 # 06 mapping ---------------------------------------------------------------
 library(leaflet)
