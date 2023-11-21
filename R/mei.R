@@ -26,6 +26,8 @@ meiv2 <- left_join(mei, sa) %>%
   mutate(day = 1, 
          date = as.Date(paste0(YEAR,"-",month,"-",day)))
 
+# save(meiv2, file = here('output', 'data', 'mei.RData'))
+
 mei.plot <-
 ggplot(meiv2, aes(x = date, y = mei)) +
   geom_ribbon(aes(ymin = pmin(mei, 0), ymax = 0), fill = "blue", col = "blue", alpha = 0.5) +
