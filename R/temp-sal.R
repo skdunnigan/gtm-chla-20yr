@@ -124,6 +124,8 @@ MET_mo <- MET %>%
   aggreswmp(by = "months", FUN = fun_in, params = c('totprcp')) %>% 
   filter(datetimestamp > "2002-12-31")
 
+# save(MET_mo, file = here('output', 'data', 'MET_mo.RData'))
+
 # rainfall graph
 MET %>% 
   aggreswmp(by = "years", FUN = fun_in, params = c('totprcp')) %>% 
