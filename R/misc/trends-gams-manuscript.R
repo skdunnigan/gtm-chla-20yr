@@ -29,7 +29,7 @@ show_prdseries_mod <-  function (mod, alpha = 0.7, base_size = 11, xlim = NULL,
                    legend.title = ggplot2::element_blank(), 
                    axis.title.x = ggplot2::element_blank(),
                    axis.text = element_text(size = 12, color = "black")) +
-    ggplot2::labs(y = "Chlorophyll-a (\U00B5g/L)") + 
+    ggplot2::labs(y = "Chl-a (\U00B5g/L)") + 
     ggplot2::coord_cartesian(xlim = xlim, ylim = ylim)
   if (trans != "ident") 
     p <- p + ggplot2::scale_y_log10()
@@ -184,19 +184,18 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
 
 # create series plots -----------------------------------------------------
 
-plot1 <- function(mod, site, threshold, save) {
-  ylab <- "Chlorophyll-a (\U00B5g/L)"
+plot1 <- function(mod, site, save) {
+  ylab <- "Chl-a (\U00B5g/L)"
   
   site <- paste(site)
   filename <- paste0(site,".plots.png")
   
   a <- show_prdseries_mod(mod)
-  b <- show_metseason_mod(mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab) + 
-    geom_hline(yintercept = threshold, linetype = "dashed", linewidth = 1, color = "gray75") 
+  b <- show_metseason_mod(mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab) + labs(title = "") 
   c <- show_trndseason_mod(mod, doystr = 1, doyend = 365, justify = 'center', win = 5, 
-                       ylab = 'Log10 chlorophyll a change/yr, average')
+                       ylab = 'Log10 chl-a change/yr, average') + labs(title = "", subtitle = "")
   
-  d <- a / b / c
+  d <- a / b / c + plot_annotation(tag_levels = "A")
   
   if (save == TRUE) {
     ggsave(d, filename = here('output', 'figures', 'trends', filename))
@@ -207,14 +206,35 @@ plot1 <- function(mod, site, threshold, save) {
   
 }
 
-plot1(mod = pi.mod, site = "PI", threshold = 6.6, save = F)
-plot1(mod = j17.mod, site = "JXTR17", threshold = 6.6, save = T)
-plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = T)
-plot1(mod = j21.mod, site = "JXTR21", threshold = 4.0, save = T)
-plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = T)
-plot1(mod = mrt.mod, site = "MRT", threshold = 5.5, save = T)
-plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = T)
+plot1(mod = pi.mod, site = "PI", save = F)
+plot1(mod = ss.mod, site = "SS", save = F)
+plot1(mod = fm.mod, site = "FM", save = F)
+plot1(mod = pc.mod, site = "PC", save = F)
 
 # seasonal trend plots based on fulcrum period ----------------------------
 
+plot2 <- function(mod, site, save) {
+  ylab <- "Chl-a (\U00B5g/L)"
+  
+  site <- paste(site)
+  filename <- paste0(site,".plots.png")
+  
+  a <- show_metseason_mod(mod, doystr = 121, doyend = 227, yrstr = 2003, yrend = 2022, ylab = ylab) + labs(title = "") 
+  b <- show_trndseason_mod(mod, doystr = 121, doyend = 227, justify = 'center', win = 5, 
+                           ylab = 'Log10 chl-a change/yr, average') + labs(title = "", subtitle = "")
+  
+  c <- a / b + plot_annotation(tag_levels = "A")
+  
+  if (save == TRUE) {
+    ggsave(c, filename = here('output', 'figures', 'trends', filename))
+  }
+  else {
+    print(c)
+  }
+  
+}
 
+plot2(mod = pi.mod, site = "PI", save = F)
+plot2(mod = ss.mod, site = "SS", save = F)
+plot2(mod = fm.mod, site = "FM", save = F)
+plot2(mod = pc.mod, site = "PC", save = F)
