@@ -8,30 +8,30 @@ source(here('R', 'misc', '04_variability-fxns.R')) # load decomposition function
 # load data ---------------------------------------------------------------
 # load all data that has had the missing values filled in with the GAM predictions
 load(here('output', 'data', 'pi.RData'))
-load(here('output', 'data', 'j17.RData'))
+# load(here('output', 'data', 'j17.RData'))
 load(here('output', 'data', 'ss.RData'))
-load(here('output', 'data', 'j21.RData'))
+# load(here('output', 'data', 'j21.RData'))
 load(here('output', 'data', 'fm.RData'))
-load(here('output', 'data', 'mrt.RData'))
+# load(here('output', 'data', 'mrt.RData'))
 load(here('output', 'data', 'pc.RData'))
 
 
 
 # variability figures -----------------------------------------------------
 ## create variability figure (from Cloern and Jassby 2010)
-var_fig(dat = mdat.pi, site = "GTMPINUT", save = T) 
+var_fig(dat = mdat.pi, site = "PI", save = F) 
 
-var_fig(dat = mdat.j17, site = "JXTR17", save = T) 
+# var_fig(dat = mdat.j17, site = "JXTR17", save = T) 
 
-var_fig(dat = mdat.ss, site = "GTMSSNUT", save = T)
+var_fig(dat = mdat.ss, site = "SS", save = F)
 
-var_fig(dat = mdat.j21, site = "JXTR21", save = T) 
+# var_fig(dat = mdat.j21, site = "JXTR21", save = T) 
 
-var_fig(dat = mdat.fm, site = "GTMFMNUT", save = T) 
+var_fig(dat = mdat.fm, site = "FM", save = F) 
 
-var_fig(dat = mdat.mrt, site = "MRT", save = T) 
+# var_fig(dat = mdat.mrt, site = "MRT", save = T) 
 
-var_fig(dat = mdat.pc, site = "GTMPCNUT", save = T) 
+var_fig(dat = mdat.pc, site = "PC", save = F) 
 
 
 # variability sd tables ---------------------------------------------------

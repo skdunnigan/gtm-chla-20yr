@@ -84,8 +84,8 @@ var_fig <- function(dat, site, save){
   a <- ggplot(decomp) +
     geom_line(aes(x = date, y = value), color = "blue") +
     scale_x_date(date_breaks = "year", date_labels = "%Y") +
-    theme_bw() +
-    theme(axis.text.x = element_text(colour = c(NA, NA, "black", NA, NA)),
+    theme_bw(base_family = "serif") +
+    theme(axis.text.x = element_text(size = 12, colour = c(NA, NA, "black", NA, NA)),
           panel.grid.minor = element_blank(),
           axis.text = element_text(color = "black")) +
     labs(x = '',
@@ -96,23 +96,23 @@ var_fig <- function(dat, site, save){
     select(year, interann) %>% 
     unique() %>% 
     ggplot() +
-    geom_col(aes(x = year, y = interann-1), fill = "red") +
-    geom_hline(yintercept = 0, color = "red") +
+    geom_col(aes(x = year, y = interann-1), fill = "tomato") +
+    geom_hline(yintercept = 0, color = "tomato") +
     scale_x_continuous(breaks = seq(2000, 2022, by = 1)) +
     scale_y_continuous(limits = c(-1,1)) +
-    theme_bw() +
-    theme(axis.text.x = element_text(colour = c(NA, NA, NA, "black", NA)),
+    theme_bw(base_family = "serif") +
+    theme(axis.text.x = element_text(size = 12, colour = c(NA, NA, NA, "black", NA)),
           panel.grid = element_blank(),
           axis.text = element_text(color = "black")) +
     labs(x = '',
          y = 'Annual')
   c <- ggplot(decomp) +
-    geom_col(aes(x = date, y = events-1), fill = "purple") +
-    geom_hline(yintercept = 0, color = "purple") +
+    geom_col(aes(x = date, y = events-1), fill = "darkorchid4") +
+    geom_hline(yintercept = 0, color = "darkorchid4") +
     scale_x_date(date_breaks = "year", date_labels = "%Y") +
     scale_y_continuous(limits = c(-1,2)) +
-    theme_bw() +
-    theme(axis.text.x = element_text(colour = c(NA, NA,"black", NA, NA)),
+    theme_bw(base_family = "serif") +
+    theme(axis.text.x = element_text(size = 12, colour = c(NA, NA,"black", NA, NA)),
           panel.grid = element_blank(),
           axis.text = element_text(color = "black")) +
     labs(x = '',
@@ -122,11 +122,11 @@ var_fig <- function(dat, site, save){
     select(month, season) %>% 
     unique %>% 
     ggplot() +
-    geom_col(aes(x = month, y = season-1), fill = "green") +
-    geom_hline(yintercept = 0, color = "green") +
+    geom_col(aes(x = month, y = season-1), fill = "darkgreen") +
+    geom_hline(yintercept = 0, color = "darkgreen") +
     scale_y_continuous(limits = c(-1,1)) +
-    theme_bw() +
-    theme(axis.text = element_text(color = "black"),
+    theme_bw(base_family = "serif") +
+    theme(axis.text = element_text(size = 12, color = "black"),
           panel.grid = element_blank()) +
     labs(x = '',
          y = 'Season')
