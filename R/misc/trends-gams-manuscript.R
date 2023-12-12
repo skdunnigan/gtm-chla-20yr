@@ -20,9 +20,9 @@ show_prdseries_mod <-  function (mod, alpha = 0.7, base_size = 11, xlim = NULL,
                                                           date = as.Date(date))
   p <- ggplot2::ggplot(prds, ggplot2::aes(x = date)) + 
     ggplot2::geom_point(data = moddat, 
-                        ggplot2::aes(y = value), color = "gray60", size = 1) + 
+                        ggplot2::aes(y = value), shape = 1, color = "black") + 
     ggplot2::geom_line(ggplot2::aes(y = value), 
-                       linewidth = 0.75, alpha = alpha, colour = "#56B4E9") + 
+                       linewidth = 0.75, alpha = alpha, colour = "darkgreen") + 
     ggplot2::theme_bw(base_family = "serif", 
                       base_size = base_size) + 
     ggplot2::theme(legend.position = "top", 
@@ -127,10 +127,12 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
   subttl <- NULL
   toplo1 <- metseason
   p <- ggplot2::ggplot(data = toplo1, ggplot2::aes(x = yr, 
-                                                   y = bt_met)) + ggplot2::geom_point(colour = "deepskyblue3") + 
+                                                   y = bt_met)) + 
+    ggplot2::geom_point(colour = "black") + 
     ggplot2::geom_errorbar(ggplot2::aes(ymin = bt_lwr, ymax = bt_upr), 
-                           colour = "deepskyblue3") + ggplot2::theme_bw(base_family = "serif", 
-                                                                        base_size = base_size) + 
+                           colour = "black") + 
+    ggplot2::theme_bw(base_family = "serif", 
+                      base_size = base_size) + 
     ggplot2::theme(axis.title.x = ggplot2::element_blank(),
                    axis.text = ggplot2::element_text(color = "black", size = 12))
   if (!any(is.null(yrstr) | is.null(yrend))) {
@@ -174,8 +176,8 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
                        ": slope ", slope, ", ", pval)
     }
     p <- p + ggplot2::geom_ribbon(data = toplo2, ggplot2::aes(ymin = bt_lwr, 
-                                                              ymax = bt_upr), fill = "pink", alpha = 0.4) + ggplot2::geom_line(data = toplo2, 
-                                                                                                                               color = "pink")
+                                                              ymax = bt_upr), fill = "tomato", alpha = 0.4) + 
+      ggplot2::geom_line(data = toplo2, color = "tomato")
   }
   p <- p + ggplot2::labs(title = ttl, subtitle = subttl, y = ylab) + 
     ggplot2::coord_cartesian(xlim = xlim, ylim = ylim)
