@@ -5,11 +5,11 @@ source(here('R', '00_loadpackages.R'))
 # load data ---------------------------------------------------------------
 # load all data that has had the missing values filled in with the GAM predictions
 load(here('output', 'data', 'pi.RData'))
-load(here('output', 'data', 'j17.RData'))
+# load(here('output', 'data', 'j17.RData'))
 load(here('output', 'data', 'ss.RData'))
-load(here('output', 'data', 'j21.RData'))
+# load(here('output', 'data', 'j21.RData'))
 load(here('output', 'data', 'fm.RData'))
-load(here('output', 'data', 'mrt.RData'))
+# load(here('output', 'data', 'mrt.RData'))
 load(here('output', 'data', 'pc.RData'))
 
 
@@ -67,11 +67,8 @@ fulc <- function(dat, station, save, stat){
 }
 
 fulc(dat = mdat.pi, station = "GTMPINUT", save = T, stat = F)
-fulc(dat = mdat.j17, station = "JXTR17", save = T, stat = F)
 fulc(dat = mdat.ss, station = "GTMSSNUT", save = T, stat = F)
-fulc(dat = mdat.j21, station = "JXTR21", save = T, stat = F)
 fulc(dat = mdat.fm, station = "GTMFMNUT", save = T, stat = F)
-fulc(dat = mdat.mrt, station = "MRT", save = T, stat = F)
 fulc(dat = mdat.pc, station = "GTMPCNUT", save = T, stat = F)
 
 # fulcrum output 
@@ -93,10 +90,18 @@ fulc_tbl <- function(dat){
   print(phenoPhase(ts))
 }
   
-fulc_tbl(dat = mdat.pi) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.j17) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.ss) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.j21) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.fm) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.mrt) %>% arrange(fulcrum)
-fulc_tbl(dat = mdat.pc) %>% arrange(fulcrum)
+pi <- fulc_tbl(dat = mdat.pi) %>% mutate(site = "PI")
+ss <- fulc_tbl(dat = mdat.ss) %>% mutate(site = "SS")
+fm <- fulc_tbl(dat = mdat.fm) %>% mutate(site = "FM")
+pc <- fulc_tbl(dat = mdat.pc) %>% mutate(site = "PC")
+
+bind_rows(pi, ss, fm, pc) %>% 
+  ggplot(aes(x = year, y = fulcrum, group = site)) +
+  geom_point(aes(shape = site), size = 2) +
+  geom_smooth(aes(linetype = site), method = "lm", se = F, color = "black") +
+  theme_classic(base_family = "serif") +
+  theme(axis.text = element_text(size = 12)) +
+  labs(x = "", 
+       y = "Fulcrums of Cumulative Chl-a",
+       shape = "Site",
+       linetype = "Site")
