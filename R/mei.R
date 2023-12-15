@@ -30,16 +30,16 @@ meiv2 <- left_join(mei, sa) %>%
 
 mei.plot <-
 ggplot(meiv2, aes(x = date, y = mei)) +
-  geom_ribbon(aes(ymin = pmin(mei, 0), ymax = 0), fill = "blue", col = "blue", alpha = 0.5) +
-  geom_ribbon(aes(ymin = 0, ymax = pmax(mei, 0)), fill = "red", col = "red", alpha = 0.5) +
+  geom_ribbon(aes(ymin = pmin(mei, 0), ymax = 0), fill = "#0075AC", col = "#0075AC", alpha = 0.5) +
+  geom_ribbon(aes(ymin = 0, ymax = pmax(mei, 0)), fill = "tomato", col = "tomato", alpha = 0.5) +
   geom_hline(yintercept = 0, color = "black") + 
   scale_x_date(date_minor_breaks = "year") +
-  theme_bw() +
+  theme_bw(base_family = "serif") +
   theme(axis.text = element_text(size = 12, color = "black")) +
   labs(y = "MEI.v2",
-       x = "",
-       title = "Multivariate ENSO Index (MEI) from 2003-2022.
-       Positive values (red) indicate El Ni\U00F1o periods and negative values (blue) La Ni\U00F1 a periods.")
+       x = "")
+       # title = "Multivariate ENSO Index (MEI) from 2003-2022.
+       # Positive values (red) indicate El Ni\U00F1o periods and negative values (blue) La Ni\U00F1 a periods.")
 
 print(mei.plot)
 
