@@ -1,10 +1,12 @@
 
+# set up session ----------------------------------------------------------
+
+library(here)
+source(here('R', '00_loadpackages.R'))
+
 # load model files --------------------------------------------------------
 
 load(file = here("output", "models", "fm.mod.RData")) 
-load(file = here("output", "models", "j17.mod.RData")) 
-load(file = here("output", "models", "j21.mod.RData")) 
-load(file = here("output", "models", "mrt.mod.RData")) 
 load(file = here("output", "models", "pc.mod.RData")) 
 load(file = here("output", "models", "pi.mod.RData"))
 load(file = here("output", "models", "ss.mod.RData")) 
@@ -64,11 +66,8 @@ plot1 <- function(mod, site, threshold, save) {
 }
 
 plot1(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = T)
-plot1(mod = j17.mod, site = "JXTR17", threshold = 6.6, save = T)
 plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = T)
-plot1(mod = j21.mod, site = "JXTR21", threshold = 4.0, save = T)
 plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = T)
-plot1(mod = mrt.mod, site = "MRT", threshold = 5.5, save = T)
 plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = T)
 
 
