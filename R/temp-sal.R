@@ -75,7 +75,7 @@ b <- wq_dat %>%
   filter(datetimestamp > "2002-12-31") %>% 
   ggplot() +
   geom_line(aes(x = datetimestamp, y = sal, color = station), linewidth = 1) +
-  scale_x_date(date_labels = "%Y") +
+  scale_x_date(date_labels = "%Y", minor_breaks = "years") +
   scale_y_continuous(expand = c(0,0)) +
   scale_color_colorblind() +
   theme_bw(base_family = "serif") + 
@@ -100,7 +100,7 @@ a <- wq_dat %>%
   filter(datetimestamp > "2002-12-31") %>% 
   ggplot() +
   geom_line(aes(x = datetimestamp, y = temp, color = station), linewidth = 1) +
-  scale_x_date(date_labels = "%Y") +
+  scale_x_date(date_labels = "%Y", minor_breaks = "years") +
   scale_y_continuous(expand = c(0,0)) +
   scale_color_colorblind() +
   theme_bw(base_family = "serif") + 

@@ -29,6 +29,7 @@ show_prdseries_mod <-  function (mod, alpha = 0.7, base_size = 11, xlim = NULL,
                    legend.title = ggplot2::element_blank(), 
                    axis.title.x = ggplot2::element_blank(),
                    axis.text = element_text(size = 12, color = "black")) +
+    ggplot2::scale_x_date(date_minor_breaks = "years") +
     ggplot2::labs(y = "Chl-a (\U00B5g/L)") + 
     ggplot2::coord_cartesian(xlim = xlim, ylim = ylim)
   if (trans != "ident") 
@@ -212,31 +213,3 @@ plot1(mod = pi.mod, site = "PI", save = F)
 plot1(mod = ss.mod, site = "SS", save = F)
 plot1(mod = fm.mod, site = "FM", save = F)
 plot1(mod = pc.mod, site = "PC", save = F)
-
-# seasonal trend plots based on fulcrum period ----------------------------
-
-plot2 <- function(mod, site, save) {
-  ylab <- "Chl-a (\U00B5g/L)"
-  
-  site <- paste(site)
-  filename <- paste0(site,".plots.png")
-  
-  a <- show_metseason_mod(mod, doystr = 121, doyend = 227, yrstr = 2003, yrend = 2022, ylab = ylab) + labs(title = "") 
-  b <- show_trndseason_mod(mod, doystr = 121, doyend = 227, justify = 'center', win = 5, 
-                           ylab = 'Log10 chl-a change/yr, average') + labs(title = "", subtitle = "")
-  
-  c <- a / b + plot_annotation(tag_levels = "A")
-  
-  if (save == TRUE) {
-    ggsave(c, filename = here('output', 'figures', 'trends', filename))
-  }
-  else {
-    print(c)
-  }
-  
-}
-
-plot2(mod = pi.mod, site = "PI", save = F)
-plot2(mod = ss.mod, site = "SS", save = F)
-plot2(mod = fm.mod, site = "FM", save = F)
-plot2(mod = pc.mod, site = "PC", save = F)

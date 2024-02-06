@@ -32,9 +32,6 @@ if(!require(wqtrends)){
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
 if(!require(patchwork)) { install.packages("patchwork") }  ; library(patchwork)
 
-if(!require(changepoint)) { install.packages("changepoint")}; library(changepoint)
-
-if(!require(strucchange)) { install.packages('strucchange')}; library(strucchange)
 ```
 
 # Data
