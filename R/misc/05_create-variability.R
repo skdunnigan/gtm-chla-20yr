@@ -8,11 +8,8 @@ source(here('R', 'misc', '04_variability-fxns.R')) # load decomposition function
 # load data ---------------------------------------------------------------
 # load all data that has had the missing values filled in with the GAM predictions
 load(here('output', 'data', 'pi.RData'))
-# load(here('output', 'data', 'j17.RData'))
 load(here('output', 'data', 'ss.RData'))
-# load(here('output', 'data', 'j21.RData'))
 load(here('output', 'data', 'fm.RData'))
-# load(here('output', 'data', 'mrt.RData'))
 load(here('output', 'data', 'pc.RData'))
 
 
