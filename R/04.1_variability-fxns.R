@@ -1,5 +1,12 @@
+
+# quantify variability ----------------------------------------------------
+
 library(here)
 source(here('R', '00_loadpackages.R'))
+
+
+# decomp-fxn --------------------------------------------------------------
+
 
 # function comes from Cloern and Jassby 2010 Supplemental Material
 
@@ -54,6 +61,9 @@ decomp.mult <- function(x, startyr = NULL , endyr = NULL, event = T){
   }
   if(class(x)[1]!='mts') results[[1]] else results
 }
+
+
+# full figure -------------------------------------------------------------
 
 var_fig <- function(dat, site, save){
   
@@ -140,6 +150,57 @@ var_fig <- function(dat, site, save){
   }
   
 }
+
+
+# seasonal_fig ------------------------------------------------------------
+
+seas_var_fig <- function(dat){
+  
+  filename <- paste0("seasonal-var.png")
+  
+  ts <- ts(as.data.frame(dat %>%
+                           ungroup() %>% 
+                           select(date, value) %>%
+                           arrange(date) %>%
+                           select(value)
+  ),
+  start = c(2003, 1),
+  end = c(2022, 12),
+  frequency = 12
+  )
+  
+  decomp <- data.frame(decomp.mult(ts)
+  ) %>% 
+    rename(value = original) %>% 
+    bind_cols((dat %>% 
+                 select(date, value) %>% 
+                 arrange(date)
+    )) %>% 
+    select(-7) %>% 
+    rename(value = 1)
+  
+  d <- decomp %>% 
+    mutate(month = month(date, label = T)) %>% 
+    select(month, season) %>% 
+    unique %>% 
+    ggplot() +
+    geom_segment(aes(x = month, xend = month, y = 0, yend = season-1), color = "black") +
+    geom_point(aes(x = month, y = season-1), size = 3,color = "darkgreen") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    scale_y_continuous(limits = c(-1,1)) +
+    theme_bw(base_family = "serif") +
+    theme(axis.text = element_text(size = 12, color = "black"),
+          panel.grid = element_blank()) +
+    labs(x = '',
+         y = 'Season')
+  
+  print(d)
+}
+
+
+# standard deviations of coefficients -------------------------------------
+
+
 
 sd_fxn <- function(dat, station) {
   
