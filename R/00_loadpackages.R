@@ -19,8 +19,6 @@ if(!require(wqtrends)){
     CRAN = 'https://cloud.r-project.org'))
   install.packages('wqtrends')} ; library(wqtrends) # models and plots for trends
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
-# if(!require(changepoint)) { install.packages("changepoint")}; library(changepoint)
-if(!require(strucchange)) { install.packages('strucchange')}; library(strucchange)
 # library(psych)
 library(wql)
 
@@ -35,9 +33,3 @@ library(patchwork) # grid graphics
 library(scales) # scale functions for visualization
 library(plotly) # create interactive web graphics - use for html output files
 library(ggthemes) # theme expansion for ggplot2
-
-# 06 mapping ---------------------------------------------------------------
-library(leaflet)
-library(htmltools)
-library(sf)
-
