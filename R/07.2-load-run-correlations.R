@@ -1,9 +1,11 @@
-# combine monthly total rainfall, chla, avg temp, avg sal, mei for correlation
+# Run correlations on mei and monthly chlorophyll with environmental data
+# data includes sample month and preceding month for
+# total rainfall, monthly average, avg daily minimums, avg daily maximums
 
 # load packages
 library(here)
 source(here('R', '00_loadpackages.R'))
-library(ggcorrplot)
+
 
 # load correlation data for PI
 
@@ -37,7 +39,8 @@ a <- ggcorrplot(corr, p.mat = p.mat,
            outline.color = "transparent",
            lab = TRUE,
            legend.title = "Spearman rho",
-           colors = c("#0075AC", "white", "tomato")) +
+           colors = c("#0075AC", "white", "tomato"),
+           lab_size = 3) +
   theme_classic(base_family = "serif") +
   theme(# everything in theme is strictly aesthetics
     legend.text = element_text(size=12),
@@ -48,7 +51,7 @@ a <- ggcorrplot(corr, p.mat = p.mat,
     axis.text.x = element_text(angle = 90, vjust=0.3, size=12, color='black'),
     axis.text.y = element_text(size=12, color='black'),
     axis.ticks.x = element_line(color='black'),
-    plot.title = element_text(size = 16, face='bold'),
+    # plot.title = element_text(size = 16, face='bold'),
     plot.subtitle = element_text(size = 11, face = 'italic'))
 
 print(a)
@@ -60,3 +63,9 @@ corr_plot_fxn(pi_cor)
 corr_plot_fxn(ss_cor)
 corr_plot_fxn(fm_cor)
 corr_plot_fxn(pc_cor)
+
+# examine matrix
+pi_cor %>% 
+select(-datetimestamp) %>% 
+  data.matrix() %>% 
+  cor(method = "spearman", use = "everything")
