@@ -65,10 +65,10 @@ plot1 <- function(mod, site, threshold, save) {
   
 }
 
-plot1(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = T)
-plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = T)
-plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = T)
-plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = T)
+plot1(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = F)
+plot1(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = F)
+plot1(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = F)
+plot1(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = F)
 
 
 # create trend plots for 3 timeframes -------------------------------------
@@ -98,11 +98,8 @@ plot2 <- function(mod, site, threshold, save) {
 }
 
 plot2(mod = pi.mod, site = "GTMPINUT", threshold = 6.6, save = T)
-plot2(mod = j17.mod, site = "JXTR17", threshold = 6.6, save = T)
 plot2(mod = ss.mod, site = "GTMSSNUT", threshold = 4.0, save = T)
-plot2(mod = j21.mod, site = "JXTR21", threshold = 4.0, save = T)
 plot2(mod = fm.mod, site = "GTMFMNUT", threshold = 5.5, save = T)
-plot2(mod = mrt.mod, site = "MRT", threshold = 5.5, save = T)
 plot2(mod = pc.mod, site = "GTMPCNUT", threshold = 4.3, save = T)
 
 
