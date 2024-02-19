@@ -1,3 +1,11 @@
+# load model files --------------------------------------------------------
+
+load(file = here("output", "models", "fm.mod.RData")) 
+load(file = here("output", "models", "pc.mod.RData")) 
+load(file = here("output", "models", "pi.mod.RData"))
+load(file = here("output", "models", "ss.mod.RData")) 
+
+
 # pi mix-meta regression model results for 
 
 # set the seasonal timeframe for annual period
@@ -67,7 +75,7 @@ show_mettrndseason2 <- function (mod, metfun = mean, doystr = 1, doyend = 364, j
     ggplot2::geom_point(ggplot2::aes(fill = trnd), 
                         pch = 21, color = "black", size = size) + 
     ggplot2::theme_bw(base_size = base_size, 
-                      base_family = "serif") + 
+                      base_family = "sans") + 
     ggplot2::scale_x_continuous(minor_breaks = c(2003, 2004, 2005, 2006, 2007,
                                                  2008, 2009, 2010, 2011, 2012,
                                                  2013, 2014, 2015, 2016, 2017, 
@@ -83,12 +91,12 @@ show_mettrndseason2 <- function (mod, metfun = mean, doystr = 1, doyend = 364, j
 
 
 a <- show_mettrndseason2(pi.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                   win = 5, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "A")
+                   win = 3, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "A")
 b <- show_mettrndseason2(ss.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 5, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "B")
+                        win = 3, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "B")
 c <- show_mettrndseason2(fm.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 5, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "C")
+                        win = 3, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "none") + labs(title = "C")
 d <- show_mettrndseason2(pc.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 5, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "bottom") + labs(title = "D")
+                        win = 3, ylab = 'Chlorophyll-a (ug/L)') + theme(legend.position = "bottom") + labs(title = "D")
 
 a / b / c / d
