@@ -23,7 +23,7 @@ show_prdseries_mod <-  function (mod, alpha = 0.7, base_size = 11, xlim = NULL,
                         ggplot2::aes(y = value), shape = 1, color = "black") + 
     ggplot2::geom_line(ggplot2::aes(y = value), 
                        linewidth = 0.75, alpha = alpha, colour = "darkgreen") + 
-    ggplot2::theme_bw(base_family = "serif", 
+    ggplot2::theme_bw(base_family = "sans", 
                       base_size = base_size) + 
     ggplot2::theme(legend.position = "top", 
                    legend.title = ggplot2::element_blank(), 
@@ -89,7 +89,7 @@ show_trndseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364,
   }
   p <- p + ggplot2::geom_point(shape = 21, size = 3) + ggplot2::scale_fill_manual(values = c("white", 
                                                                                              "tomato1"), drop = FALSE) + ggplot2::scale_x_continuous(limits = yrrng) + 
-    ggplot2::theme_bw(base_family = "serif", 
+    ggplot2::theme_bw(base_family = "sans", 
                       base_size = base_size) + 
     ggplot2::theme(axis.title.x = ggplot2::element_blank(), 
                    legend.position = "bottom", 
@@ -132,7 +132,7 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
     ggplot2::geom_point(colour = "black") + 
     ggplot2::geom_errorbar(ggplot2::aes(ymin = bt_lwr, ymax = bt_upr), 
                            colour = "black") + 
-    ggplot2::theme_bw(base_family = "serif", 
+    ggplot2::theme_bw(base_family = "sans", 
                       base_size = base_size) + 
     ggplot2::theme(axis.title.x = ggplot2::element_blank(),
                    axis.text = ggplot2::element_text(color = "black", size = 12))
@@ -195,7 +195,7 @@ plot1 <- function(mod, site, save) {
   
   a <- show_prdseries_mod(mod)
   b <- show_metseason_mod(mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab) + labs(title = "") 
-  c <- show_trndseason_mod(mod, doystr = 1, doyend = 365, justify = 'center', win = 5, 
+  c <- show_trndseason_mod(mod, doystr = 1, doyend = 365, justify = 'center', win = 3, 
                        ylab = 'Log10 chl-a change/yr, average') + labs(title = "", subtitle = "")
   
   d <- a / b / c + plot_annotation(tag_levels = "A")
