@@ -19,8 +19,7 @@ if(!require(wqtrends)){
     CRAN = 'https://cloud.r-project.org'))
   install.packages('wqtrends')} ; library(wqtrends) # models and plots for trends
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
-# library(psych)
-library(wql)
+library(wql) # phenoPhase function for fulcrum calculations
 
 # 04 markdown ----
 library(rmarkdown)
