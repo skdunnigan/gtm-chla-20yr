@@ -6,6 +6,9 @@ load(file = here("output", "models", "pi.mod.RData"))
 load(file = here("output", "models", "ss.mod.RData")) 
 
 
+# trend analysis ----------------------------------------------------------
+
+ylab <- "Chl-a (\U00B5g/L)"
 # pi mix-meta regression model results for 
 
 # set the seasonal timeframe for annual period
@@ -19,6 +22,33 @@ summary(anlz_mixmeta(metseason_pi, yrstr = 2013, yrend = 2022))
 summary(anlz_mixmeta(metseason_pi, yrstr = 2018, yrend = 2022))
 # full 20 years
 summary(anlz_mixmeta(metseason_pi, yrstr = 2003, yrend = 2022))
+show_metseason(pi.mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab)
+
+# ss
+# 
+metseason_ss <- anlz_metseason(ss.mod, doystr = 1, doyend = 365)
+# full 20 years
+summary(anlz_mixmeta(metseason_ss, yrstr = 2003, yrend = 2022))
+show_metseason(ss.mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab)
+# first 10
+summary(anlz_mixmeta(metseason_ss, yrstr = 2003, yrend = 2012))
+# last 10
+summary(anlz_mixmeta(metseason_ss, yrstr = 2013, yrend = 2022))
+# last 5
+summary(anlz_mixmeta(metseason_ss, yrstr = 2018, yrend = 2022))
+
+# fm
+#
+metseason_fm <- anlz_metseason(fm.mod, doystr = 1, doyend = 365)
+# full 20 years
+summary(anlz_mixmeta(metseason_fm, yrstr = 2003, yrend = 2022))
+show_metseason(fm.mod, doystr = 1, doyend = 365, yrstr = 2018, yrend = 2022, ylab = ylab)
+# first 10
+summary(anlz_mixmeta(metseason_fm, yrstr = 2003, yrend = 2012))
+# last 10
+summary(anlz_mixmeta(metseason_fm, yrstr = 2013, yrend = 2022))
+# last 5
+summary(anlz_mixmeta(metseason_fm, yrstr = 2018, yrend = 2022))
 
 # create stacked graph combining annual averages from fitted GAM with points added for the metrics colored by trends estimated 
 # in a 5 year center justified window
