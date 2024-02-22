@@ -28,7 +28,8 @@ show_prdseries_mod <-  function (mod, alpha = 0.7, base_size = 11, xlim = NULL,
     ggplot2::theme(legend.position = "top", 
                    legend.title = ggplot2::element_blank(), 
                    axis.title.x = ggplot2::element_blank(),
-                   axis.text = element_text(size = 12, color = "black")) +
+                   axis.text = element_text(color = "black"),
+                   plot.margin = unit(c(1,1,1,1), "pt")) +
     ggplot2::scale_x_date(date_minor_breaks = "years") +
     ggplot2::labs(y = "Chl-a (\U00B5g/L)") + 
     ggplot2::coord_cartesian(xlim = xlim, ylim = ylim)
@@ -135,7 +136,8 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
     ggplot2::theme_bw(base_family = "sans", 
                       base_size = base_size) + 
     ggplot2::theme(axis.title.x = ggplot2::element_blank(),
-                   axis.text = ggplot2::element_text(color = "black", size = 12))
+                   axis.text = ggplot2::element_text(color = "black"),
+                   plot.margin = unit(c(1,1,1,1), "pt"))
   if (!any(is.null(yrstr) | is.null(yrend))) {
     mixmet <- anlz_mixmeta(metseason, yrstr = yrstr, yrend = yrend, 
                            yromit = yromit)
@@ -163,9 +165,12 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
       logslope <- round(logslope, 2)
       logslope <- paste0(logslope[1], " (", logslope[2], 
                          ", ", logslope[3], ")")
-      subttl <- paste0("Trend from ", yrstr, " to ", yrend, 
-                       ": approximate slope ", slope, ", log-slope ", 
-                       logslope, ", ", pval)
+      # subttl <- paste0("Trend from ", yrstr, " to ", yrend, 
+      #                  ": approximate slope ", slope, ", log-slope ", 
+      #                  logslope, ", ", pval)
+      # subttl <- paste0("Approximate slope ", slope, ", log-slope ", 
+      #                  logslope, ", ", pval)
+      subttl <- NULL
     }
     if (mod$trans == "ident") {
       slope <- summary(mixmet)$coefficients[2, c(1, 5, 
@@ -176,8 +181,9 @@ show_metseason_mod <- function (mod, metfun = mean, doystr = 1, doyend = 364, yr
       subttl <- paste0("Trend from ", yrstr, " to ", yrend, 
                        ": slope ", slope, ", ", pval)
     }
-    p <- p + ggplot2::geom_ribbon(data = toplo2, ggplot2::aes(ymin = bt_lwr, 
-                                                              ymax = bt_upr), fill = "tomato", alpha = 0.4) + 
+    p <- p + ggplot2::geom_ribbon(data = toplo2, 
+                                  ggplot2::aes(ymin = bt_lwr, 
+                                               ymax = bt_upr), fill = "tomato", alpha = 0.4) + 
       ggplot2::geom_line(data = toplo2, color = "tomato")
   }
   p <- p + ggplot2::labs(title = ttl, subtitle = subttl, y = ylab) + 
@@ -213,3 +219,48 @@ plot1(mod = pi.mod, site = "PI", save = F)
 plot1(mod = ss.mod, site = "SS", save = F)
 plot1(mod = fm.mod, site = "FM", save = F)
 plot1(mod = pc.mod, site = "PC", save = F)
+
+
+# figures -----------------------------------------------------------------
+
+# freshwater stations
+# 
+ylab <- "Chl-a (\U00B5g/L)"
+
+pi.gam <- show_prdseries_mod(pi.mod) + labs(title = "A")
+pi.trd <- show_metseason_mod(pi.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "C")
+
+pc.gam <- show_prdseries_mod(pc.mod) + labs(title = "B", y = "")
+pc.trd <- show_metseason_mod(pc.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "D",
+                                                 y = "")
+fig2 <- 
+(pi.gam + pc.gam) / 
+  (pi.trd + pc.trd)
+
+ggsave(fig2, filename = here('output', 'figures', 'finals', 'figure2.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 5)
+
+# marine stations
+# 
+ss.gam <- show_prdseries_mod(ss.mod) + labs(title = "A")
+ss.trd <- show_metseason_mod(ss.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "C")
+
+fm.gam <- show_prdseries_mod(fm.mod) + labs(title = "B", y = "")
+fm.trd <- show_metseason_mod(fm.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "D",
+                                                 y = "")
+fig3 <- 
+  (ss.gam + fm.gam) / 
+  (ss.trd + fm.trd)
+
+ggsave(fig3, filename = here('output', 'figures', 'finals', 'figure3.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 5)
