@@ -33,32 +33,38 @@ MET_yr <- MET %>%
 # annual rainfall plots ---------------------------------------------------
 
 # rainfall graph
+a <-
 MET_yr %>% 
   ggplot() +
   geom_col(aes(x = datetimestamp, y = rainfall_cm), fill = "#0075AC",
            width = 150) +
   scale_y_continuous(expand = c(0,0), limits = c(0,200)) +
   geom_hline(yintercept = 119.834, linetype = "dashed") +
-  theme_bw(base_family = "serif") +
-  theme(axis.text = element_text(color = "black", size = 12),
-        axis.title.y = element_text(color = "black")) +
-  labs(x = "", y = "Rainfall, cm")
+  theme_bw() +
+  theme(axis.text = element_text(color = "black"),
+        axis.title.y = element_text(color = "black"),
+        plot.margin = unit(c(1,1,1,1), "pt")) +
+  labs(x = "", y = "Total Rainfall (cm)",
+       title = "A")
 
+b <- 
 MET_yr %>% 
   ggplot(aes(x = datetimestamp)) +
-  geom_col(aes(y = dev.avg), , fill = "#0075AC",
-           width = 150) +
+  geom_segment(aes(xend = datetimestamp, y = 0, yend = dev.avg)) +
+  geom_point(aes(y = dev.avg, shape = dev.avg > 0), size = 2, color = "#0075AC") +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  theme_bw(base_family = "serif") +
-  theme(axis.text = element_text(color = "black", size = 12),
+  scale_shape_discrete(name = "", labels = c("Drier", "Wetter")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        plot.margin = unit(c(1,1,1,1), "pt")) +
+  theme(axis.text = element_text(color = "black"),
         axis.title.y = element_text(color = "black")) +
-  labs(x = "", y = "Deviation from Average Rainfall, cm") +
-  annotate("text",
-           label = "Wetter", 
-           x = as.Date("2003-01-01"),
-           y = 20) +
-  annotate("text",
-           label = "Drier", 
-           x = as.Date("2003-01-01"),
-           y = -30)
+  labs(x = "", y = "Deviation from Average Rainfall (cm)",
+       title = "B") 
 
+fig10 <- 
+a / b
+
+ggsave(fig10, filename = here('output', 'figures', 'finals', 'figure10.png'),
+       dpi = 600, units = 'in',
+       width = 6.5, height = 7)

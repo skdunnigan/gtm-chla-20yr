@@ -223,6 +223,26 @@ plot1(mod = pc.mod, site = "PC", save = F)
 
 # figures -----------------------------------------------------------------
 
+# marine stations
+# 
+ss.gam <- show_prdseries_mod(ss.mod) + labs(title = "A")
+ss.trd <- show_metseason_mod(ss.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "C")
+
+fm.gam <- show_prdseries_mod(fm.mod) + labs(title = "B", y = "")
+fm.trd <- show_metseason_mod(fm.mod, doystr = 1, doyend = 365, 
+                             yrstr = 2003, yrend = 2022, 
+                             ylab = ylab) + labs(title = "D",
+                                                 y = "")
+fig2 <- 
+  (ss.gam + fm.gam) / 
+  (ss.trd + fm.trd)
+
+ggsave(fig2, filename = here('output', 'figures', 'finals', 'figure2.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 5)
+
 # freshwater stations
 # 
 ylab <- "Chl-a (\U00B5g/L)"
@@ -237,29 +257,9 @@ pc.trd <- show_metseason_mod(pc.mod, doystr = 1, doyend = 365,
                              yrstr = 2003, yrend = 2022, 
                              ylab = ylab) + labs(title = "D",
                                                  y = "")
-fig2 <- 
-(pi.gam + pc.gam) / 
-  (pi.trd + pc.trd)
-
-ggsave(fig2, filename = here('output', 'figures', 'finals', 'figure2.png'),
-       dpi = 600, units = "in",
-       width = 6.5, height = 5)
-
-# marine stations
-# 
-ss.gam <- show_prdseries_mod(ss.mod) + labs(title = "A")
-ss.trd <- show_metseason_mod(ss.mod, doystr = 1, doyend = 365, 
-                             yrstr = 2003, yrend = 2022, 
-                             ylab = ylab) + labs(title = "C")
-
-fm.gam <- show_prdseries_mod(fm.mod) + labs(title = "B", y = "")
-fm.trd <- show_metseason_mod(fm.mod, doystr = 1, doyend = 365, 
-                             yrstr = 2003, yrend = 2022, 
-                             ylab = ylab) + labs(title = "D",
-                                                 y = "")
 fig3 <- 
-  (ss.gam + fm.gam) / 
-  (ss.trd + fm.trd)
+  (pi.gam + pc.gam) / 
+  (pi.trd + pc.trd)
 
 ggsave(fig3, filename = here('output', 'figures', 'finals', 'figure3.png'),
        dpi = 600, units = "in",

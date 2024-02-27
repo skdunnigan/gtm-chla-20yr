@@ -34,6 +34,26 @@ sd <- bind_rows(pi, ss, fm, pc) %>% select(4, 1:3)
 
 write.csv(sd, file = here('output', 'data', 'sd-variability.csv'))
 
+# annual variability for manuscript ---------------------------------------
+
+pi <- ann_var_fig(mdat.pi)
+ss <- ann_var_fig(mdat.ss)
+fm <- ann_var_fig(mdat.fm)
+pc <- ann_var_fig(mdat.pc)
+
+multi <- (pi + theme(axis.text.x = element_blank()) + labs(title = "A")) / 
+  (ss + theme(axis.text.x = element_blank()) + labs(title = "B")) / 
+  (fm + theme(axis.text.x = element_blank()) + labs(title = "C")) / 
+  (pc + labs(title = "D"))
+
+multi
+
+ggsave(multi, filename = here('output', 'figures', 'finals', 'figure4.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 7)
+
+rm(list=ls())
+
 
 # seasonal variability for manuscript -------------------------------------
 
@@ -49,4 +69,11 @@ multi <- (pi + theme(axis.text.x = element_blank()) + labs(title = "A")) /
 
 multi
 
+ggsave(multi, filename = here('output', 'figures', 'finals', 'figure6.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 7)
+
 rm(list=ls())
+
+
+

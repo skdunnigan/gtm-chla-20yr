@@ -1,3 +1,16 @@
+# annual change figures for manuscript combining elements of 04.1_variability fxns with 02.3_trends-gam-plots
+
+library(here)
+source(here('R', '00_loadpackages.R'))
+source(here('R', '04.1_variability-fxns.R'))
+# 
+# load data ---------------------------------------------------------------
+# load all data that has had the missing values filled in with the GAM predictions
+load(here('output', 'data', 'pi.RData'))
+load(here('output', 'data', 'ss.RData'))
+load(here('output', 'data', 'fm.RData'))
+load(here('output', 'data', 'pc.RData'))
+
 # load model files --------------------------------------------------------
 
 load(file = here("output", "models", "fm.mod.RData")) 
@@ -5,69 +18,18 @@ load(file = here("output", "models", "pc.mod.RData"))
 load(file = here("output", "models", "pi.mod.RData"))
 load(file = here("output", "models", "ss.mod.RData")) 
 
+ 
+# change points fxn
 
-# trend analysis ----------------------------------------------------------
+# change points graph fxn -------------------------------------------------
 
-ylab <- "Chl-a (\U00B5g/L)"
-# pi mix-meta regression model results for 
-
-# set the seasonal timeframe for annual period
-metseason_pi <- anlz_metseason(pi.mod, doystr = 1, doyend = 365)
-
-# first 10 years
-summary(anlz_mixmeta(metseason_pi, yrstr = 2003, yrend = 2012))
-# last 10 years
-summary(anlz_mixmeta(metseason_pi, yrstr = 2013, yrend = 2022))
-# last five years
-summary(anlz_mixmeta(metseason_pi, yrstr = 2018, yrend = 2022))
-# full 20 years
-summary(anlz_mixmeta(metseason_pi, yrstr = 2003, yrend = 2022))
-show_metseason(pi.mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab)
-
-# ss
-# 
-metseason_ss <- anlz_metseason(ss.mod, doystr = 1, doyend = 365)
-# full 20 years
-summary(anlz_mixmeta(metseason_ss, yrstr = 2003, yrend = 2022))
-show_metseason(ss.mod, doystr = 1, doyend = 365, yrstr = 2003, yrend = 2022, ylab = ylab)
-# first 10
-summary(anlz_mixmeta(metseason_ss, yrstr = 2003, yrend = 2012))
-# last 10
-summary(anlz_mixmeta(metseason_ss, yrstr = 2013, yrend = 2022))
-# last 5
-summary(anlz_mixmeta(metseason_ss, yrstr = 2018, yrend = 2022))
-
-# fm
-#
-metseason_fm <- anlz_metseason(fm.mod, doystr = 1, doyend = 365)
-# full 20 years
-summary(anlz_mixmeta(metseason_fm, yrstr = 2003, yrend = 2022))
-show_metseason(fm.mod, doystr = 1, doyend = 365, yrstr = 2018, yrend = 2022, ylab = ylab)
-# first 10
-summary(anlz_mixmeta(metseason_fm, yrstr = 2003, yrend = 2012))
-# last 10
-summary(anlz_mixmeta(metseason_fm, yrstr = 2013, yrend = 2022))
-# last 5
-summary(anlz_mixmeta(metseason_fm, yrstr = 2018, yrend = 2022))
-
-# pc
-#
-metseason_pc <- anlz_metseason(pc.mod, doystr = 1, doyend = 365)
-# full 20 years
-summary(anlz_mixmeta(metseason_pc, yrstr = 2003, yrend = 2022))
-# first 10
-summary(anlz_mixmeta(metseason_pc, yrstr = 2003, yrend = 2012))
-# last 10
-summary(anlz_mixmeta(metseason_pc, yrstr = 2013, yrend = 2022))
-# last 5
-summary(anlz_mixmeta(metseason_pc, yrstr = 2018, yrend = 2022))
 
 # create stacked graph combining annual averages from fitted GAM with points added for the metrics colored by trends estimated 
 # in a 5 year center justified window
 show_mettrndseason2 <- function (mod, metfun = mean, doystr = 1, doyend = 364, justify = c("center", "left", "right"), 
                                  win = 5, nsim = 10000, useave = FALSE, 
-          yromit = NULL, ylab, width = 0.9, size = 3, nms = NULL, cols = NULL, 
-          cmbn = F, base_size = 11, xlim = NULL, ylim = NULL, ...) 
+                                 yromit = NULL, ylab, width = 0.9, size = 3, nms = NULL, cols = NULL, 
+                                 cmbn = F, base_size = 11, xlim = NULL, ylim = NULL, ...) 
 {
   trndseason <- anlz_trndseason(mod = mod, metfun, doystr = doystr, 
                                 doyend = doyend, justify = justify, win = win, useave = useave)
@@ -95,7 +57,7 @@ show_mettrndseason2 <- function (mod, metfun = mean, doystr = 1, doyend = 364, j
       dplyr::mutate(trnd = dplyr::case_when(yrcoef > 0 & pval < 0.05 ~ cols[1], 
                                             yrcoef < 0 & pval < 0.05 ~ cols[2], 
                                             pval >= 0.05 | is.na(yrcoef) ~ cols[3]), 
-                                               trnd = factor(trnd, levels = cols, labels = nms))
+                    trnd = factor(trnd, levels = cols, labels = nms))
   }
   names(cols) <- nms
   if (!is.null(yromit)) 
@@ -132,18 +94,31 @@ show_mettrndseason2 <- function (mod, metfun = mean, doystr = 1, doyend = 364, j
 }
 
 
-a <- show_mettrndseason2(pi.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                   win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "none") + labs(title = "A")
-b <- show_mettrndseason2(ss.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "none") + labs(title = "B")
-c <- show_mettrndseason2(fm.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "none") + labs(title = "C")
-d <- show_mettrndseason2(pc.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
-                        win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "bottom") + labs(title = "D")
+# make figures ------------------------------------------------------------
 
-fig5 <-
-a / b / c / d
+pia <- ann_var_fig(mdat.pi) + labs(y = "Annual Component")
 
-ggsave(fig4, filename = here('output', 'figures', 'finals', 'figure5.png'),
-       dpi = 600, units = "in",
-       width = 6.5, height = 7)
+pib <- show_mettrndseason2(pi.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
+                           win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "bottom")
+
+ssa <- ann_var_fig(mdat.ss) + labs(y = "Annual Component")
+  
+ssb <- show_mettrndseason2(ss.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
+                           win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "bottom")
+  
+  
+fma <- ann_var_fig(mdat.fm) + labs(y = "Annual Component")
+
+fmb <- show_mettrndseason2(fm.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
+                           win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "bottom")
+
+
+pca <- ann_var_fig(mdat.pc) + labs(y = "Annual Component")
+
+pcb <- show_mettrndseason2(pc.mod, metfun = mean, doystr = 1, doyend = 365, justify = 'center', 
+                           win = 3, ylab = 'Chl-a (ug/L)') + theme(legend.position = "none") 
+
+fig5 <- pia / pib
+fig6 <- ssa / ssb
+fig7 <- fma / fmb
+fig8 <- pca / pcb

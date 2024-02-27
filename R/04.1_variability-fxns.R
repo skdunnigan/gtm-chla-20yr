@@ -94,7 +94,7 @@ var_fig <- function(dat, site, save){
   a <- ggplot(decomp) +
     geom_line(aes(x = date, y = value), color = "blue") +
     scale_x_date(date_breaks = "year", date_labels = "%Y") +
-    theme_bw(base_family = "serif") +
+    theme_bw() +
     theme(axis.text.x = element_text(size = 12, colour = c(NA, NA, "black", NA, NA)),
           panel.grid.minor = element_blank(),
           axis.text = element_text(color = "black")) +
@@ -110,7 +110,7 @@ var_fig <- function(dat, site, save){
     geom_hline(yintercept = 0, color = "tomato") +
     scale_x_continuous(breaks = seq(2000, 2022, by = 1)) +
     scale_y_continuous(limits = c(-1,1)) +
-    theme_bw(base_family = "serif") +
+    theme_bw() +
     theme(axis.text.x = element_text(size = 12, colour = c(NA, NA, NA, "black", NA)),
           panel.grid = element_blank(),
           axis.text = element_text(color = "black")) +
@@ -121,7 +121,7 @@ var_fig <- function(dat, site, save){
     geom_hline(yintercept = 0, color = "darkorchid4") +
     scale_x_date(date_breaks = "year", date_labels = "%Y") +
     scale_y_continuous(limits = c(-1,2)) +
-    theme_bw(base_family = "serif") +
+    theme_bw() +
     theme(axis.text.x = element_text(size = 12, colour = c(NA, NA,"black", NA, NA)),
           panel.grid = element_blank(),
           axis.text = element_text(color = "black")) +
@@ -135,7 +135,7 @@ var_fig <- function(dat, site, save){
     geom_col(aes(x = month, y = season-1), fill = "darkgreen") +
     geom_hline(yintercept = 0, color = "darkgreen") +
     scale_y_continuous(limits = c(-1,1)) +
-    theme_bw(base_family = "serif") +
+    theme_bw() +
     theme(axis.text = element_text(size = 12, color = "black"),
           panel.grid = element_blank()) +
     labs(x = '',
@@ -187,15 +187,63 @@ seas_var_fig <- function(dat){
     geom_col(aes(x = month, y = season-1), fill = "darkgreen") +
     geom_hline(yintercept = 0, color = "darkgreen") +
     scale_y_continuous(limits = c(-1,1)) +
-    theme_bw(base_family = "serif") +
-    theme(axis.text = element_text(size = 12, color = "black"),
-          panel.grid = element_blank()) +
+    theme_bw() +
+    theme(axis.text = element_text(color = "black"),
+          panel.grid.minor = element_blank()) +
     labs(x = '',
          y = 'Season')
   
   print(d)
 }
 
+
+# annual figure -----------------------------------------------------------
+
+
+
+ann_var_fig <- function(dat){
+  
+  filename <- paste0("ann-var.png")
+  
+  ts <- ts(as.data.frame(dat %>%
+                           ungroup() %>% 
+                           select(date, value) %>%
+                           arrange(date) %>%
+                           select(value)
+  ),
+  start = c(2003, 1),
+  end = c(2022, 12),
+  frequency = 12
+  )
+  
+  decomp <- data.frame(decomp.mult(ts)
+  ) %>% 
+    rename(value = original) %>% 
+    bind_cols((dat %>% 
+                 select(date, value) %>% 
+                 arrange(date)
+    )) %>% 
+    select(-7) %>% 
+    rename(value = 1)
+  
+  d <- decomp %>% 
+    mutate(year = year(date)) %>% 
+    select(year, interann) %>% 
+    unique() %>% 
+    ggplot() +
+    geom_col(aes(x = year, y = interann-1), fill = "tomato") +
+    geom_hline(yintercept = 0, color = "tomato") +
+    scale_x_continuous(breaks = seq(2000, 2022, by = 1)) +
+    scale_y_continuous(limits = c(-1,1)) +
+    theme_bw() +
+    theme(axis.text.x = element_text(colour = c(NA, NA, NA, "black", NA)),
+          axis.text = element_text(color = "black"),
+          panel.grid.minor = element_blank()) +
+    labs(x = '',
+         y = 'Annual')
+  
+  print(d)
+}
 
 # standard deviations of coefficients -------------------------------------
 
