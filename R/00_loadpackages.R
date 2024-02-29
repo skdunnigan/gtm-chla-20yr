@@ -4,6 +4,7 @@ library(readxl) # read excel files
 library(janitor) # simple tools to clean dirty data
 library(here) # a simpler way to find your files
 library(SWMPr) # working with SWMP data from the NERRS
+library(xlsx) # excel formats
 
 # 02 tidy and wrangle ----
 library(tidyverse) # because...tidyverse (ggplot2, tidyr, dplyr)
@@ -20,6 +21,8 @@ if(!require(wqtrends)){
   install.packages('wqtrends')} ; library(wqtrends) # models and plots for trends
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
 library(wql) # phenoPhase function for fulcrum calculations
+library(report) # make summaries easier
+
 
 # 04 markdown ----
 library(rmarkdown)
