@@ -22,6 +22,7 @@ if(!require(wqtrends)){
 if(!require(mgcv)){ install.packages("mgcv") } ;  library(mgcv)
 library(wql) # phenoPhase function for fulcrum calculations
 library(report) # make summaries easier
+library(easystats) # includes correlation and report packages
 
 
 # 04 markdown ----
