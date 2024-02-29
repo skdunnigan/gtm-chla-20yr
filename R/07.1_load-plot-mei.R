@@ -34,8 +34,8 @@ ggplot(meiv2, aes(x = date, y = mei)) +
   geom_ribbon(aes(ymin = 0, ymax = pmax(mei, 0)), fill = "tomato", col = "tomato", alpha = 0.5) +
   geom_hline(yintercept = 0, color = "black") + 
   scale_x_date(date_minor_breaks = "year") +
-  theme_bw(base_family = "serif") +
-  theme(axis.text = element_text(size = 12, color = "black")) +
+  theme_bw() +
+  theme(axis.text = element_text(color = "black")) +
   labs(y = "MEI.v2",
        x = "")
        # title = "Multivariate ENSO Index (MEI) from 2003-2022.

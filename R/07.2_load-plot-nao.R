@@ -22,8 +22,9 @@ months <- tribble(
   "Nov", 11,
   "Dec", 12)
 
+nao.plot <- 
 nao %>% 
-  filter(Year > 2002) %>% 
+  filter(Year > 2002 & Year < 2023) %>% 
   pivot_longer(cols = c(2:13), names_to = "month", values_to = "nao") %>% 
   left_join(months, by = "month") %>% 
   mutate(day = 1,
@@ -34,6 +35,6 @@ nao %>%
   geom_hline(yintercept = 0, color = "black") + 
   scale_x_date(date_minor_breaks = "year") +
   theme_bw(base_family = "sans") +
-  theme(axis.text = element_text(size = 12, color = "black")) +
+  theme(axis.text = element_text(color = "black")) +
   labs(y = "NAO",
        x = "")

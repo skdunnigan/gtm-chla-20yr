@@ -40,7 +40,7 @@ a / b
 
 ggsave(fig8, filename = here('output', 'figures', 'finals', 'figure8.png'),
        dpi = 600, units = "in",
-       height = 7, width = 6.5)
+       height = 6, width = 6.5)
 
 # annual min and max plot
 temp_max <- wq_min_max %>% 
