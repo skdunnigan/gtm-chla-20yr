@@ -18,8 +18,8 @@ a <- wq_mean_dat %>%
   scale_color_colorblind() +
   theme_bw() + 
   theme(axis.text = element_text(colour = "black"),
-        legend.position = "top") +
-  labs(x = "", y = "Temperature (\u00b0C)", color = "")
+        legend.position = "none") +
+  labs(x = "", y = "Temperature (\u00b0C)", color = "", title = "A")
 
 # monthly avg sal
 b <- wq_mean_dat %>% 
@@ -31,8 +31,8 @@ b <- wq_mean_dat %>%
   scale_color_colorblind() +
   theme_bw() + 
   theme(axis.text = element_text(colour = "black"),
-        legend.position = "none") +
-  labs(x = "", y = "Salinity (PSU)", color = "")
+        legend.position = "bottom") +
+  labs(x = "", y = "Salinity (PSU)", color = "", title = "B")
 
 # stacked plot
 fig8 <-
