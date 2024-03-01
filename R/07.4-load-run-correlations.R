@@ -112,3 +112,53 @@ corr <- dat %>%
                            redundant = TRUE) %>% 
   dplyr::filter(Parameter1 == "chla") %>% 
   xlsx::write.xlsx(file = here('output', 'correlation-chla.xlsx'))
+
+View(corr)
+
+friendly_names <- tribble(
+  ~Parameter2, ~friendly,
+  "mei", "MEI",
+  "nao", "NAO"
+  "sal_avg", "Monthly\nSportabout"
+  "sal_max_avg",
+  "sal_max_prec_avg",
+  "sal_min_avg",
+  "sal_min_prec_avg",
+  "sal_prec_avg",
+  "temp_avg",
+  "temp_max_avg",
+  "temp_max_prec_avg",
+  "temp_min_avg",
+  "temp_min_prec_avg",
+  "temp_prec_avg",
+  "totprcp",
+  "totprcp_prec",
+)
+
+corr_plot <- 
+corr %>% 
+  select(Group, Parameter2, rho, p) %>% 
+  mutate(Group = factor(Group, levels = c("PC",
+                                          "FM",
+                                          "SS",
+                                          "PI"))) %>% 
+  filter(Parameter2 != "chla" & p < 0.05) %>% 
+  ggplot(aes(x = Parameter2, y = Group)) +
+  geom_tile(aes(fill = rho), color = "black") +
+  scale_fill_distiller(palette = "RdBu", limits = c(-1, 1)) +
+  geom_text(aes(label = round(rho, digits = 2)),
+            size = 3) +
+  theme_classic() +
+  theme(axis.text = element_text(color = "black"),
+        axis.text.x = element_text(angle = 90, vjust = 0.4,
+                                   hjust = 1),
+        axis.line.y = element_blank(),
+        axis.line.x = element_blank(),
+        legend.position = "top") +
+  labs(x = "Parameter and Aggregation",
+       y = "Station")
+
+ggsave(corr_plot, filename = here('output', 'figures', 'finals',
+                                  'figure12.png'),
+       dpi = 600, units = "in",
+       width = 6.5, height = 4.5)
